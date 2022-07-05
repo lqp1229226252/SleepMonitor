@@ -9,7 +9,6 @@
 #include "QButtonGroup"
 #include "QLineEdit"
 #include "QPushButton"
-#include "QtSerialPort/QSerialPort"
 class ComboBox: public QWidget
 {
     Q_OBJECT
@@ -116,9 +115,6 @@ private:
     uint8_t   buf_collect_res_low;
     uint8_t   buf_num;
     uint8_t   buf_end;
-
-    QSerialPort *serial;
-
 
 };
 
