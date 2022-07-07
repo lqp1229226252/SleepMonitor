@@ -1,6 +1,5 @@
-#ifndef WIDGET_H
-#define WIDGET_H
-
+#ifndef Widget_H
+#define Widget_H
 #include <QWidget>
 #include "QComboBox"
 #include "QLabel"
@@ -55,13 +54,13 @@ private:
 };
 
 
-class Widget : public QWidget
+class ContralDataWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    Widget(QWidget *parent = nullptr);
-    ~Widget();
+    ContralDataWidget(QWidget *parent = nullptr);
+    ~ContralDataWidget();
     void initBuf();
     void setUI();
     void setConnect();
@@ -118,4 +117,4 @@ private:
 
 };
 
-#endif // WIDGET_H
+#endif // Widget_H

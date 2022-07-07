@@ -1,4 +1,4 @@
-#include "widget.h"
+#include "ContralDataWidget.h"
 #include "QObject"
 #include "QByteArray"
 #include "QRegExp"
@@ -134,7 +134,7 @@ void CheckBoxList::slot(int index)
     emit(check(buffer));
 
 }
-Widget::Widget(QWidget *parent)
+ContralDataWidget::ContralDataWidget(QWidget *parent)
     : QWidget(parent)
 {
     this->hbox1=new QHBoxLayout();
@@ -160,7 +160,7 @@ Widget::Widget(QWidget *parent)
     setSize(700,200);
 }
 
-Widget::~Widget()
+ContralDataWidget::~ContralDataWidget()
 {
     delete hbox;
     delete  hbox1;
@@ -171,7 +171,7 @@ Widget::~Widget()
     delete  send_vbox;
 
 }
-void Widget::initBuf()
+void ContralDataWidget::initBuf()
 {
    buf_head=0xBE;
    buf_len=0x0D;
@@ -184,7 +184,7 @@ void Widget::initBuf()
    buf_end=0xEB;
 }
 
-void Widget::setUI()
+void ContralDataWidget::setUI()
 {
 
      //数据采样控制UI
@@ -237,7 +237,7 @@ void Widget::setUI()
     this->send_vbox->addStretch(1);
 }
 
-void Widget::setConnect()
+void ContralDataWidget::setConnect()
 {
     connect(&collect_control_ui,SIGNAL(currentIndexChanged(int)),this,SLOT(comboBoxSlot1(int)));
     connect(&brain_collect_rate_ui,SIGNAL(currentIndexChanged(int)),this,SLOT(comboBoxSlot2(int)));
@@ -249,7 +249,7 @@ void Widget::setConnect()
     connect(&send_btn,SIGNAL(clicked()),this,SLOT(sendSlot()));
 }
 
-void Widget::comboBoxSlot1(int index)
+void ContralDataWidget::comboBoxSlot1(int index)
 {
      if(index==0)
          this->buf_collect_contral=0xaa;
@@ -261,41 +261,41 @@ void Widget::comboBoxSlot1(int index)
          this->buf_collect_contral=0xDD;
 }
 
-void Widget::comboBoxSlot2(int index)
+void ContralDataWidget::comboBoxSlot2(int index)
 {
     this->buf_collect_rate&=0x3F;
     this->buf_collect_rate+=(index<<6);
 }
 
-void Widget::comboBoxSlot3(int index)
+void ContralDataWidget::comboBoxSlot3(int index)
 {
     this->buf_collect_rate&=0XCF;
     this->buf_collect_rate+=(index<<4);
 }
-void Widget::comboBoxSlot4(int index)
+void ContralDataWidget::comboBoxSlot4(int index)
 {
     this->buf_collect_rate&=0XF3;
     this->buf_collect_rate+=(index<<2);
 }
-void Widget::comboBoxSlot5(int index)
+void ContralDataWidget::comboBoxSlot5(int index)
 {
     this->buf_collect_rate&=0XFC;
     this->buf_collect_rate+=index;
 }
 
-void Widget::checkSlot1(QByteArray buffer)
+void ContralDataWidget::checkSlot1(QByteArray buffer)
 {
     this->buf_collect_res_high=uint8_t(buffer.at(0));
     uint8_t temp=this->buf_collect_res_low&0x3F;
     this->buf_collect_res_low=uint8_t(buffer.at(1))+temp;
 }
-void Widget::checkSlot2(QByteArray buffer)
+void ContralDataWidget::checkSlot2(QByteArray buffer)
 {
     uint8_t temp=this->buf_collect_res_low&0xC0;
     this->buf_collect_res_low=temp+(uint8_t(buffer.at(0))>>2);
 //    qDebug()<<this->buf_collect_res_low;
 }
-void Widget::sendSlot()
+void ContralDataWidget::sendSlot()
 {
     QByteArray buffer;
     this->buf_num++;
@@ -324,9 +324,12 @@ void Widget::sendSlot()
     emit(sendSingal(buffer));
 
 }
-uint8_t Widget::cal_verify(uint16_t data)
+uint8_t ContralDataWidget::cal_verify(uint16_t data)
 {
-   int sum=this->buf_collect_contral;
+   int sum=this->buf_head;
+   sum+=this->buf_len;
+   sum+=this->buf_code;
+   sum+=this->buf_collect_contral;
    sum+=this->buf_collect_rate;
    sum+=(this->buf_collect_res_high<<8);
    sum+=this->buf_collect_res_low;
@@ -335,7 +338,7 @@ uint8_t Widget::cal_verify(uint16_t data)
    return verify;
 }
 
-void Widget::setFontSize(int size)
+void ContralDataWidget::setFontSize(int size)
 {
    QFont font;
    font.setPointSize(size);
@@ -348,7 +351,7 @@ void Widget::setFontSize(int size)
    this->collect2.setFontSize(font);
 }
 
-void Widget::setSize(int w, int h)
+void ContralDataWidget::setSize(int w, int h)
 {
     if(w<600)
        w=600;
