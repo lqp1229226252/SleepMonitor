@@ -45,9 +45,10 @@ QByteArray SleepInterventionWidget::enCode()
 {
 
      QByteArray buffer;
+
      buffer.append(char(buf_head));
-     buffer.append(char(buf_len>>8));
      buffer.append(char(buf_len));
+     buffer.append(char(buf_len>>8));
      buffer.append(char(buf_code));
      buffer.append(char(buf_amplitude_data));
      buffer.append(char(buf_timedata));
