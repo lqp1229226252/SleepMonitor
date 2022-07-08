@@ -303,8 +303,8 @@ void ContralDataWidget::sendSlot()
     //#帧头
     buffer.append(char(this->buf_head));
     //      #帧长
-    buffer.append((char(this->buf_len&0xFF00)));
-    buffer.append((char(this->buf_len&0xFF)>>8));
+    buffer.append(char(this->buf_len));
+    buffer.append(char(this->buf_len)>>8);
     //      #功能码
     buffer.append(char(this->buf_code));
     //      #数据
