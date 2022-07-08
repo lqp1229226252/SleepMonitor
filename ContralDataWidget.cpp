@@ -303,8 +303,8 @@ void ContralDataWidget::sendSlot()
     //#帧头
     buffer.append(char(this->buf_head));
     //      #帧长
-    buffer.append((char(this->buf_len&0xFF00)>>8));
-    buffer.append((char(this->buf_len&0xFF)));
+    buffer.append((char(this->buf_len&0xFF00)));
+    buffer.append((char(this->buf_len&0xFF)>>8));
     //      #功能码
     buffer.append(char(this->buf_code));
     //      #数据
@@ -312,8 +312,8 @@ void ContralDataWidget::sendSlot()
     buffer.append(char(this->buf_collect_rate));//#采样率
     buffer.append(char(this->buf_collect_res_high));//#采样源
     buffer.append(char(this->buf_collect_res_low));
-    buffer.append(char(buf_collect_point>>8));//#采样数据点数
-    buffer.append(char(buf_collect_point));
+    buffer.append(char(buf_collect_point));//#采样数据点数
+    buffer.append(char(buf_collect_point>>8));
     //校验码
     buffer.append(char(cal_verify(buf_collect_point)));
     //#帧序
