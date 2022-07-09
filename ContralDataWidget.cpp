@@ -310,8 +310,8 @@ void ContralDataWidget::sendSlot()
     //      #数据
     buffer.append(char(this->buf_collect_contral));//#采样控制
     buffer.append(char(this->buf_collect_rate));//#采样率
-    buffer.append(char(this->buf_collect_res_high));//#采样源
-    buffer.append(char(this->buf_collect_res_low));
+    buffer.append(char(this->buf_collect_res_low));//#采样源
+    buffer.append(char(this->buf_collect_res_high));
     buffer.append(char(buf_collect_point));//#采样数据点数
     buffer.append(char(buf_collect_point>>8));
     //校验码
