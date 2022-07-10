@@ -37,8 +37,11 @@ void CommSetWidget::setFont()
 void CommSetWidget::setUI()
 {
 
+    this->setFixedSize(600,200);
+
     ui->direct_light->setText(QChar(0xf111));
     this->setLightColor(Qt::red);
+    ui->direct_light->setFixedSize(20,20);
     ui->start->setText(QChar(0xf04b));
     ui->pause->setText(QChar(0xf04c));
     ui->stop->setText(QChar(0xf04d));
@@ -47,9 +50,18 @@ void CommSetWidget::setUI()
     ui->pause->setStyleSheet("QPushButton { background-color: transparent;border:none; }");
     ui->stop->setStyleSheet("QPushButton { background-color: transparent;border:none; }");
 
+    ui->start->setFixedSize(20,20);
+    ui->pause->setFixedSize(20,20);
+    ui->stop->setFixedSize(20,20);
+
     QStringList bound_rates={"1000000","9600","57600","115200"};
     ui->bound_rate->addItems(bound_rates);
     ui->bound_rate->setEditable(true);
+    ui->bound_rate->setFixedSize(100,20);
+
+
+    ui->serial->setFixedSize(100,20);
+    ui->serial_detect->setFixedSize(100,20);
 }
 
 void CommSetWidget::setLightColor(Qt::GlobalColor color)
@@ -58,6 +70,10 @@ void CommSetWidget::setLightColor(Qt::GlobalColor color)
     pe.setColor(QPalette::Background,Qt::black);
     pe.setColor(QPalette::WindowText,color);
     ui->direct_light->setPalette(pe);
+}
+void CommSetWidget::setSize(int w, int h)
+{
+//    this->set
 }
 void CommSetWidget::write(QByteArray buffer)
 {

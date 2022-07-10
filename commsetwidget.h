@@ -17,6 +17,7 @@ public:
     void setFont();
     void setUI();
     void setLightColor(Qt::GlobalColor);
+    void setSize(int w,int h);
     void write(QByteArray);
     void messageBox(QString str);
 private slots:
