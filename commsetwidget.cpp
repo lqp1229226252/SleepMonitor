@@ -18,6 +18,9 @@ CommSetWidget::CommSetWidget(QWidget *parent) :
     on_serial_detect_clicked();
     connect(serial,SIGNAL(readyRead()),this,SLOT(readData()));
     connect(serial,SIGNAL(errorOccurred(QSerialPort::SerialPortError)),this,SLOT(dealError(QSerialPort::SerialPortError)));
+    connect(&sensordata,SIGNAL(dataSignal(QByteArray)),this,SLOT(dataSlot(QByteArray)));
+    connect(&sensordata,SIGNAL(stataSignal(QByteArray)),this,SLOT(stataSlot(QByteArray)));
+    connect(&sensordata,SIGNAL(lossRateChange(float)),this,SLOT(lossRateChangeSlot(float)));
 }
 
 CommSetWidget::~CommSetWidget()
@@ -73,7 +76,7 @@ void CommSetWidget::setLightColor(Qt::GlobalColor color)
 }
 void CommSetWidget::setSize(int w, int h)
 {
-//    this->set
+
 }
 void CommSetWidget::write(QByteArray buffer)
 {
@@ -85,6 +88,11 @@ void CommSetWidget::messageBox(QString str)
     msgBox.setWindowTitle("提示");
     msgBox.setText(str);
     msgBox.exec();
+}
+
+void CommSetWidget::setCtrlData(int nFP, int nSnore, int nLight, int nGroAcc)
+{
+    this->sensordata.setCtrlData(nFP,nSnore,nLight,nGroAcc);
 }
 void CommSetWidget::on_start_clicked()
 {
@@ -135,6 +143,7 @@ void CommSetWidget::on_stop_clicked()
 
 void CommSetWidget::on_serial_detect_clicked()
 {
+    ui->serial->clear();
     //获取全部串口信息
     QList<QSerialPortInfo> infos=QSerialPortInfo::availablePorts();
     //将检测的串口名字插入serialnames
@@ -153,6 +162,9 @@ void CommSetWidget::readData()
         //开始读取数据
         QByteArray data=this->serial->readAll();
         qDebug()<<data;
+        sensordata.appendData(data);
+
+
     }
 }
 
@@ -163,4 +175,22 @@ void CommSetWidget::dealError(QSerialPort::SerialPortError error)
         this->setLightColor(Qt::red);
         this->messageBox("设备已经断开");
     }
+}
+
+void CommSetWidget::dataSlot(QByteArray data)
+{
+    qDebug()<<data;
+    emit(dataSignal(data));
+}
+
+void CommSetWidget::stataSlot(QByteArray data)
+{
+    qDebug()<<data;
+    emit(stataSignal(data));
+}
+
+void CommSetWidget::lossRateChangeSlot(float loss)
+{
+    qDebug()<<loss;
+    emit(lossRateChange(loss));
 }

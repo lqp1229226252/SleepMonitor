@@ -26,10 +26,13 @@ CONFIG += c++11
 
 SOURCES += \
         commsetwidget.cpp \
-        main.cpp
+        main.cpp \
+        sensordata.cpp
 
 HEADERS += \
-    commsetwidget.h
+    commsetwidget.h \
+    sensordata.h \
+    struct_data.h
 
 FORMS += \
     commsetwidget.ui

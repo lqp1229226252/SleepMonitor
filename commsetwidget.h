@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "QtSerialPort/QSerialPort"
+#include "sensordata.h"
 namespace Ui {
 class CommSetWidget;
 }
@@ -10,7 +11,6 @@ class CommSetWidget;
 class CommSetWidget : public QWidget
 {
     Q_OBJECT
-
 public:
     explicit CommSetWidget(QWidget *parent = nullptr);
     ~CommSetWidget();
@@ -20,6 +20,11 @@ public:
     void setSize(int w,int h);
     void write(QByteArray);
     void messageBox(QString str);
+    void setCtrlData(int,int,int,int);
+signals:
+    void dataSignal(QByteArray);
+    void stataSignal(QByteArray);
+    void lossRateChange(float);
 private slots:
     void on_start_clicked();
 
@@ -32,12 +37,18 @@ private slots:
     void readData();
     void dealError(QSerialPort::SerialPortError);
 
+    void dataSlot(QByteArray);
+    void stataSlot(QByteArray);
+    void lossRateChangeSlot(float);
+
 private:
     Ui::CommSetWidget *ui;
     QFont font;//fontawsome图标
     QSerialPort *serial;
     QStringList serialnames;
     bool pause_flag;//暂停标志位
+    SensorData sensordata;
+
 };
 
 #endif // COMMSETWND_H
