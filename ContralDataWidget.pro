@@ -25,10 +25,13 @@ CONFIG += c++11
 
 SOURCES += \
         ContralDataWidget.cpp \
+        controldata.cpp \
         main.cpp
 
 HEADERS += \
-    ContralDataWidget.h
+    ContralDataWidget.h \
+    controldata.h \
+    struct_data.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

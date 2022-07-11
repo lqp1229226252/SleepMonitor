@@ -8,6 +8,7 @@
 #include "QButtonGroup"
 #include "QLineEdit"
 #include "QPushButton"
+#include "controldata.h"
 class ComboBox: public QWidget
 {
     Q_OBJECT
@@ -67,6 +68,9 @@ public:
     uint8_t cal_verify(uint16_t);
     void setFontSize(int size);
     void setSize(int w,int h);
+    void setSDAmount();
+    SD_AMOUNT getSensorDataAmount();
+    CTRL_DATA getCtrlData();
 signals:
     void sendSingal(QByteArray);
 public slots:
@@ -114,6 +118,8 @@ private:
     uint8_t   buf_collect_res_low;
     uint8_t   buf_num;
     uint8_t   buf_end;
+
+    ControlData ctrldata;
 
 };
 

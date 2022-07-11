@@ -320,7 +320,10 @@ void ContralDataWidget::sendSlot()
     buffer.append(char(this->buf_num));
 //   #帧尾
     buffer.append(char(this->buf_end));
-    qDebug()<<buffer;
+//    qDebug()<<buffer;
+    //设置Ctral参数
+    ctrldata.setCtrlData(buf_collect_contral,buf_collect_rate,buf_collect_res_low+(buf_collect_point>>8),buf_collect_point);
+    this->setSDAmount();
     emit(sendSingal(buffer));
 
 }
@@ -365,6 +368,53 @@ void ContralDataWidget::setSize(int w, int h)
     this->body_action_rate_ui.setSize(w*0.15,h*0.3);
     this->send_btn.setFixedSize(w*0.12,h*0.8);
     this->collect_point.setFixedSize(w*0.15,h*0.15);
+}
+
+void ContralDataWidget::setSDAmount()
+{
+    quint8 data=buf_collect_rate;
+    quint8 FP_rate=data>>6;
+    quint8 snore_rate=(data&0x30)>>4;
+    quint8 light_rate=(data&0x0C)>>2;
+    quint8 groacc_rate=(data&0x03);
+    int nFP,nSnore,nLight,nGroAcc;
+    switch (FP_rate) {
+    case 0:{nFP=1;break;}
+    case 1:{nFP=2;break;}
+    case 2:{nFP=5;break;}
+    case 3:{nFP=8;break;}
+    }
+    switch (snore_rate) {
+    case 0:{nSnore=2;break;}
+    case 1:{nSnore=5;break;}
+    case 2:{nSnore=10;break;}
+    case 3:{nSnore=16;break;}
+    }
+    switch (light_rate) {
+    case 0:{nLight=1;break;}
+    case 1:{nLight=2;break;}
+    case 2:{nLight=3;break;}
+    case 3:{nLight=4;break;}
+    }
+    switch (groacc_rate) {
+    case 0:{nGroAcc=1;break;}
+    case 1:{nGroAcc=5;break;}
+    case 2:{nGroAcc=10;break;}
+    case 3:{nGroAcc=16;break;}
+    }
+    qint16 nFrameLen=7+nFP*4+nLight*3+nSnore*3+nGroAcc*2;
+    ctrldata.setSensorDataAmount(nFP,nSnore,nLight,nGroAcc,nFrameLen);
+
+}
+
+SD_AMOUNT ContralDataWidget::getSensorDataAmount()
+{
+    return ctrldata.getSensorDataAmount();
+}
+
+CTRL_DATA ContralDataWidget::getCtrlData()
+{
+    return ctrldata.getCtrlData();
 }
 
 
