@@ -329,16 +329,19 @@ void ContralDataWidget::sendSlot()
 }
 uint8_t ContralDataWidget::cal_verify(uint16_t data)
 {
-   int sum=this->buf_head;
-   sum+=this->buf_len;
-   sum+=this->buf_code;
-   sum+=this->buf_collect_contral;
-   sum+=this->buf_collect_rate;
-   sum+=(this->buf_collect_res_high<<8);
-   sum+=this->buf_collect_res_low;
-   sum+=data;
-   uint8_t verify=sum&0xFF;
-   return verify;
+    int sum=this->buf_head;
+    sum+=quint8(this->buf_len&0xFF);
+    sum+=(this->buf_len>>8);
+    sum+=this->buf_code;
+    sum+=this->buf_collect_contral;
+    sum+=this->buf_collect_rate;
+    sum+=this->buf_collect_res_low;
+    sum+=this->buf_collect_res_high;
+    sum+=quint8(data&0xFF);
+    sum+=(data>>8);
+//    qDebug()<<sum;
+    uint8_t verify=sum&0xFF;
+    return verify;
 }
 
 void ContralDataWidget::setFontSize(int size)
