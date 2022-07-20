@@ -15,7 +15,7 @@ sensordata的信号已绑定在commsetwidget中并且会发出信号，信号如
 ```
 void updatafilePath();//当模态框关闭时触发并且发送FilePathChange(QStringList);包括全部的文件路径
 void updatefilePath(int,QString);//当路径被修改时触发，并且发送void FilePathChange(int,QString);
-int的参数表示那个文件
+int的参数表示哪个文件
 0：FP
 1:light
 2:angel_acc
