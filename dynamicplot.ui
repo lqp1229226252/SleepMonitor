@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DynamicPlot</class>
+ <widget class="QWidget" name="DynamicPlot">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1228</width>
+    <height>345</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>5</number>
+   </property>
+   <property name="leftMargin">
+    <number>1</number>
+   </property>
+   <property name="topMargin">
+    <number>1</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>2</number>
+   </property>
+   <item>
+    <widget class="QCustomPlot" name="plotWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>3</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="sizeIncrement">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tableWidget">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+  <action name="action_open">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../课程/毕设/项目/材料/icon/open.png</normaloff>../../课程/毕设/项目/材料/icon/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>打开属性文件</string>
+   </property>
+  </action>
+  <action name="action_save">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../课程/毕设/项目/材料/icon/保存.png</normaloff>../../课程/毕设/项目/材料/icon/保存.png</iconset>
+   </property>
+   <property name="text">
+    <string>保存样式文件</string>
+   </property>
+   <property name="toolTip">
+    <string>保存样式文件</string>
+   </property>
+  </action>
+  <action name="action_magnify">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../课程/毕设/项目/材料/icon/放大.png</normaloff>../../课程/毕设/项目/材料/icon/放大.png</iconset>
+   </property>
+   <property name="text">
+    <string>放大</string>
+   </property>
+   <property name="toolTip">
+    <string>放大</string>
+   </property>
+  </action>
+  <action name="action_new_win_magnify">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../课程/毕设/项目/材料/icon/新窗口打开.png</normaloff>../../课程/毕设/项目/材料/icon/新窗口打开.png</iconset>
+   </property>
+   <property name="text">
+    <string>新窗口放大</string>
+   </property>
+   <property name="toolTip">
+    <string>新窗口放大</string>
+   </property>
+  </action>
+  <action name="action_recover">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../课程/毕设/项目/材料/icon/恢复.png</normaloff>../../课程/毕设/项目/材料/icon/恢复.png</iconset>
+   </property>
+   <property name="text">
+    <string>复原</string>
+   </property>
+   <property name="toolTip">
+    <string>复原</string>
+   </property>
+  </action>
+  <action name="action_save_as">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../课程/毕设/项目/材料/icon/另存为.png</normaloff>../../课程/毕设/项目/材料/icon/另存为.png</iconset>
+   </property>
+   <property name="text">
+    <string>另存为</string>
+   </property>
+   <property name="toolTip">
+    <string>另存为</string>
+   </property>
+  </action>
+  <action name="action_hide">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../课程/毕设/项目/材料/icon/隐藏1.png</normaloff>../../课程/毕设/项目/材料/icon/隐藏1.png</iconset>
+   </property>
+   <property name="text">
+    <string>隐藏属性表</string>
+   </property>
+   <property name="toolTip">
+    <string>隐藏属性表</string>
+   </property>
+  </action>
+  <action name="action_unfold">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../课程/毕设/项目/材料/icon/显示1.png</normaloff>../../课程/毕设/项目/材料/icon/显示1.png</iconset>
+   </property>
+   <property name="text">
+    <string>展开属性表</string>
+   </property>
+   <property name="toolTip">
+    <string>展开属性表</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header location="global">qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
