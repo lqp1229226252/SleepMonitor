@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "QtSerialPort/QSerialPort"
 #include "sensordata.h"
+#include "filepath.h"
 namespace Ui {
 class CommSetWidget;
 }
@@ -25,6 +26,9 @@ signals:
     void dataSignal(QByteArray);
     void stataSignal(QByteArray);
     void lossRateChange(float);
+    void fileStorageState(bool);
+    void FilePathChange(QStringList);
+    void FilePathChange(int,QString);
 private slots:
     void on_start_clicked();
 
@@ -41,6 +45,14 @@ private slots:
     void stataSlot(QByteArray);
     void lossRateChangeSlot(float);
 
+    void on_file_set_clicked();
+
+    void on_file_start_clicked();
+
+    void on_file_end_clicked();
+    void updatafilePath();
+    void updatefilePath(int,QString);
+
 private:
     Ui::CommSetWidget *ui;
     QFont font;//fontawsome图标
@@ -48,7 +60,7 @@ private:
     QStringList serialnames;
     bool pause_flag;//暂停标志位
     SensorData sensordata;
-
+    FilePath *filepath;
 };
 
 #endif // COMMSETWND_H

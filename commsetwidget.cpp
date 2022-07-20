@@ -6,12 +6,14 @@
 #include "QLineEdit"
 #include <QPalette>
 #include "QMessageBox"
+#include "filepath.h"
 CommSetWidget::CommSetWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CommSetWidget)
 {
     ui->setupUi(this);
     this->serial=new QSerialPort();
+    filepath=new FilePath();
     this->pause_flag=false;
     setFont();
     setUI();
@@ -21,11 +23,15 @@ CommSetWidget::CommSetWidget(QWidget *parent) :
     connect(&sensordata,SIGNAL(dataSignal(QByteArray)),this,SLOT(dataSlot(QByteArray)));
     connect(&sensordata,SIGNAL(stataSignal(QByteArray)),this,SLOT(stataSlot(QByteArray)));
     connect(&sensordata,SIGNAL(lossRateChange(float)),this,SLOT(lossRateChangeSlot(float)));
+    connect(filepath,SIGNAL(close()),this,SLOT(updatafilePath()));
+    connect(filepath,SIGNAL(PathChang(int,QString)),this,SLOT(updatefilePath(int,QString)));
 }
 
 CommSetWidget::~CommSetWidget()
 {
     delete ui;
+    delete serial;
+    delete filepath;
 }
 void CommSetWidget::setFont()
 {
@@ -119,6 +125,7 @@ void CommSetWidget::on_start_clicked()
 
 void CommSetWidget::on_pause_clicked()
 {
+    write("123456");
     if(serial->isOpen())
     {
        pause_flag=true;
@@ -193,4 +200,36 @@ void CommSetWidget::lossRateChangeSlot(float loss)
 {
     qDebug()<<loss;
     emit(lossRateChange(loss));
+}
+
+void CommSetWidget::on_file_set_clicked()
+{
+    filepath->show();
+}
+
+void CommSetWidget::on_file_start_clicked()
+{
+    emit(fileStorageState(true));
+}
+
+void CommSetWidget::on_file_end_clicked()
+{
+    emit(fileStorageState(true));
+}
+
+void CommSetWidget::updatafilePath()
+{
+    QStringList list;
+    list.append(filepath->getFPPath());
+    list.append(filepath->getLightPath());
+    list.append(filepath->getAngleAccPath());
+    list.append(filepath->getSnorePath());
+    list.append(filepath->getGroAcc());
+//    qDebug()<<list;
+    emit(FilePathChange(list));
+}
+
+void CommSetWidget::updatefilePath(int type, QString Path)
+{
+    emit(FilePathChange(type,Path));
 }
