@@ -184,7 +184,7 @@ void CommSetWidget::readData()
     {
         //开始读取数据
         QByteArray data=this->serial->readAll();
-        qDebug()<<data;
+//        qDebug()<<data;
         sensordata.appendData(data);
 
 
@@ -202,18 +202,19 @@ void CommSetWidget::dealError(QSerialPort::SerialPortError error)
 
 void CommSetWidget::dataSlot(QByteArray data)
 {
-    qDebug()<<data;
+//    qDebug()<<data;
     emit(dataSignal(data));
 }
 
 void CommSetWidget::stataSlot(QByteArray data)
 {
-    qDebug()<<data;
+//    qDebug()<<data;
     emit(stataSignal(data));
 }
 
 void CommSetWidget::dataSlot(QVector<double> data)
 {
+//    qDebug()<<data;
     emit(dataSignal(data));
 }
 
@@ -224,7 +225,7 @@ void CommSetWidget::stataSlot(STATE_DATA data)
 
 void CommSetWidget::lossRateChangeSlot(float loss)
 {
-    qDebug()<<loss;
+//    qDebug()<<loss;
     emit(lossRateChange(loss));
 }
 
