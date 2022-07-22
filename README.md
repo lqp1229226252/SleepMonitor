@@ -25,7 +25,7 @@
     void saveFP(QVector<SD_FP>,char flag);//以插入方式插入FP数据，其中 flag表示插入的是FP1还是FP2（1，2）
     void saveLight(QVector<SD_LIGTH>,char flag);//以插入方式插入light数据，其中 flag表示插入的是红光、绿光还是近红光（1，2，3）
     void saveAngleAcc(QVector<double>,char flag);以插入方式插入angleacc数据，其中 flag表示插入的类型（1，2，3）
-    void saveSnore(QVector<SD_SNORE>);以插入方式插入snore数据
+    void saveSnore(QVector<SD_SNORE>,char flag);以插入方式插入snore数据,其中 flag表示插入的类型（1，2，3）
     void saveGro(QVector<SD_GRO>,char flag);以插入方式插入gro数据，其中 flag表示插入的类型（1，2，3）
     void saveACC(QVector<SD_ACC>,char flag);以插入方式插入acc数据，其中 flag表示插入的类型（4，5，6）
 ```

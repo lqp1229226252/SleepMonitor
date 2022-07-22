@@ -35,7 +35,7 @@ public:
     void saveFP(QVector<SD_FP>,char flag);
     void saveLight(QVector<SD_LIGTH>,char flag);
     void saveAngleAcc(QVector<double>,char flag);
-    void saveSnore(QVector<SD_SNORE>);
+    void saveSnore(QVector<SD_SNORE>,char flag);
     void saveGro(QVector<SD_GRO>,char flag);
     void saveACC(QVector<SD_ACC>,char flag);
 

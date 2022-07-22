@@ -156,13 +156,14 @@ void ControlData::saveAngleAcc(QVector<double> angle, char flag)
     }
 }
 
-void ControlData::saveSnore(QVector<SD_SNORE> snore)
+void ControlData::saveSnore(QVector<SD_SNORE> snore,char flag)
 {
     QFile file(m_strPathSnore);
     bool isok=file.open(QIODevice::Append);
     if(isok)
     {
         QByteArray array;
+        array.append(flag);
         for(int i=0;i<snore.length();i++)
         {
             array.append(QString::number(snore[i].dbVal));
