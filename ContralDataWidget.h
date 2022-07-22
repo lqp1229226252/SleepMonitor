@@ -13,7 +13,7 @@ class ComboBox: public QWidget
 {
     Q_OBJECT
 public:
-    ComboBox(QWidget *parent=NULL);
+    ComboBox(QWidget *parent=nullptr);
     ~ComboBox();
     void setlabel(QString Text);
     void setItems(QStringList list);
