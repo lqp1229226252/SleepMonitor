@@ -1,6 +1,7 @@
 ﻿#ifndef SLEEPINTERVENTIONWIDGET_H
 #define SLEEPINTERVENTIONWIDGET_H
 
+#include "commsetwidget.h"
 #include <QWidget>
 namespace Ui {
 class SleepInterventionWidget;
@@ -17,6 +18,8 @@ public:
     void read_data();
     void cal_verify();
     QByteArray enCode();
+    void get_commSetWidget(CommSetWidget *);
+
 signals:
     void sendSignal(QByteArray);
 private slots:
@@ -32,6 +35,7 @@ private:
     uint8_t  buf_verify;
     uint8_t  buf_num;
     uint8_t  buf_end;
+    CommSetWidget *commSetWidget;
 };
 
 #endif // SLEEPINTERVENTIONWIDGET_H

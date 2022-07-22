@@ -1,4 +1,4 @@
-#include "sleepmonitor.h"
+﻿#include "sleepmonitor.h"
 #include "ui_sleepmonitor.h"
 
 SleepMonitor::SleepMonitor(QWidget *parent)
@@ -6,7 +6,10 @@ SleepMonitor::SleepMonitor(QWidget *parent)
     , ui(new Ui::SleepMonitor)
 {
     ui->setupUi(this);
+    ui->widget_controlWnd->get_eegwnd(ui->widget_eegwnd,ui->widget_outPutWnd);
 }
+
+
 
 SleepMonitor::~SleepMonitor()
 {

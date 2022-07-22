@@ -1,9 +1,10 @@
-#ifndef SENSORDATA_H
+﻿#ifndef SENSORDATA_H
 #define SENSORDATA_H
 
 #include <QObject>
 #include "struct_data.h"
 #include "QVector"
+#include <typeinfo>
 class SensorData : public QObject
 {
     Q_OBJECT
@@ -16,7 +17,7 @@ public:
     int getSnoreNum();
     int getGroAccNum();
 signals:
-    void dataSignal(QByteArray);
+    void dataSignal(QVector<double>);
     void stataSignal(QByteArray);
     void lossRateChange(float);
 public slots:
@@ -60,7 +61,7 @@ private:
    SD_ACC paraAccData(QByteArray buffer);//解析ACC数据
    SD_GRO paraGroData(QByteArray buffer);//解析Gro数据
 
-
+    QVector<double> nums;
 
    STATE_DATA paraStateData(QByteArray buffer); //解析状态数据
 

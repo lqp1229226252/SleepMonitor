@@ -1,4 +1,4 @@
-#include "eegwnd.h"
+﻿#include "eegwnd.h"
 #include "ui_eegwnd.h"
 #include <QDebug>
 #include <QTime>
@@ -15,9 +15,9 @@ EEGWnd::EEGWnd(QWidget *parent) :
     };
     send_16PlotWidget_position();
     setLineName(names);
-    qDebug()<<names.size();
+    //qDebug()<<names.size();
 
-    startTimer(50);
+//    startTimer(50);
 
 }
 
@@ -29,6 +29,7 @@ EEGWnd::~EEGWnd()
 //依次调用内部PlotWidget实例的AddDatum，将data中的值传给各个PlotWidget实例
 void EEGWnd::AddData(QVector<double> data)
 {
+    qDebug()<<"EEGWnd::AddData"<<data;
     int i=0;
     for(auto PlotWidgetPtr : m_PlotWidgetPtrs)
     {
@@ -48,7 +49,7 @@ void EEGWnd::setLineName(QVector<QString> names)
     for(auto PlotWidgetPtr : m_PlotWidgetPtrs)
     {
         PlotWidgetPtr->setLineName(names[i]);
-        qDebug()<<names[i];
+        //qDebug()<<names[i];
         i++;
     }
 }

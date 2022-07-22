@@ -1,4 +1,4 @@
-#include "commsetwidget.h"
+﻿#include "commsetwidget.h"
 #include "ui_commsetwidget.h"
 #include "QFontDatabase"
 #include "QDebug"
@@ -6,26 +6,32 @@
 #include "QLineEdit"
 #include <QPalette>
 #include "QMessageBox"
+#include "filepath.h"
 CommSetWidget::CommSetWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CommSetWidget)
 {
     ui->setupUi(this);
     this->serial=new QSerialPort();
+    filepath=new FilePath();
     this->pause_flag=false;
     setFont();
     setUI();
     on_serial_detect_clicked();
     connect(serial,SIGNAL(readyRead()),this,SLOT(readData()));
     connect(serial,SIGNAL(errorOccurred(QSerialPort::SerialPortError)),this,SLOT(dealError(QSerialPort::SerialPortError)));
-    connect(&sensordata,SIGNAL(dataSignal(QByteArray)),this,SLOT(dataSlot(QByteArray)));
+    connect(&sensordata,SIGNAL(dataSignal(QVector<double>)),this,SLOT(dataSlot(QVector<double>)));
     connect(&sensordata,SIGNAL(stataSignal(QByteArray)),this,SLOT(stataSlot(QByteArray)));
     connect(&sensordata,SIGNAL(lossRateChange(float)),this,SLOT(lossRateChangeSlot(float)));
+    connect(filepath,SIGNAL(close()),this,SLOT(updatafilePath()));
+    connect(filepath,SIGNAL(PathChang(int,QString)),this,SLOT(updatefilePath(int,QString)));
 }
 
 CommSetWidget::~CommSetWidget()
 {
     delete ui;
+    delete serial;
+    delete filepath;
 }
 void CommSetWidget::setFont()
 {
@@ -119,6 +125,7 @@ void CommSetWidget::on_start_clicked()
 
 void CommSetWidget::on_pause_clicked()
 {
+    write("123456");
     if(serial->isOpen())
     {
        pause_flag=true;
@@ -144,15 +151,10 @@ void CommSetWidget::on_stop_clicked()
 void CommSetWidget::on_serial_detect_clicked()
 {
     ui->serial->clear();
-    //获取全部串口信息
-    QList<QSerialPortInfo> infos=QSerialPortInfo::availablePorts();
-    //将检测的串口名字插入serialnames
-    for(int i=0;i<infos.size();i++)
+    foreach(const QSerialPortInfo &info,QSerialPortInfo::availablePorts())
     {
-       this->serialnames.append(infos[i].portName());
+        ui->serial->addItem(info.portName());
     }
-    //将检测的串口显示到窗口
-    ui->serial->addItems(this->serialnames);
 }
 void CommSetWidget::readData()
 {
@@ -161,7 +163,7 @@ void CommSetWidget::readData()
     {
         //开始读取数据
         QByteArray data=this->serial->readAll();
-        qDebug()<<data;
+//        qDebug()<<data;
         sensordata.appendData(data);
 
 
@@ -177,9 +179,9 @@ void CommSetWidget::dealError(QSerialPort::SerialPortError error)
     }
 }
 
-void CommSetWidget::dataSlot(QByteArray data)
+void CommSetWidget::dataSlot(QVector<double> data)
 {
-    qDebug()<<data;
+    qDebug()<<"CommSetWidget::dataSlot"<<data;
     emit(dataSignal(data));
 }
 
@@ -193,4 +195,36 @@ void CommSetWidget::lossRateChangeSlot(float loss)
 {
     qDebug()<<loss;
     emit(lossRateChange(loss));
+}
+
+void CommSetWidget::on_file_set_clicked()
+{
+    filepath->show();
+}
+
+void CommSetWidget::on_file_start_clicked()
+{
+    emit(fileStorageState(true));
+}
+
+void CommSetWidget::on_file_end_clicked()
+{
+    emit(fileStorageState(true));
+}
+
+void CommSetWidget::updatafilePath()
+{
+    QStringList list;
+    list.append(filepath->getFPPath());
+    list.append(filepath->getLightPath());
+    list.append(filepath->getAngleAccPath());
+    list.append(filepath->getSnorePath());
+    list.append(filepath->getGroAcc());
+//    qDebug()<<list;
+    emit(FilePathChange(list));
+}
+
+void CommSetWidget::updatefilePath(int type, QString Path)
+{
+    emit(FilePathChange(type,Path));
 }

@@ -13,10 +13,10 @@ DynamicPlot::DynamicPlot(QWidget *parent, const QString fileName) :
     magnifyForNewWindow(false),
     fileName(fileName),
     styleFileName(""),
-    xAxisUpper(INT_MIN),
-    xAxisLower(INT_MAX),
-    yAxisUpper(INT_MIN),
-    yAxisLower(INT_MAX),
+    xAxisUpper(50),//INT_MIN
+    xAxisLower(0),//INT_MAX
+    yAxisUpper(10),
+    yAxisLower(0),
     //设置画布背景颜色
     background0(QColor(240, 240, 240)),
     background1(QColor(240, 240, 240)),
@@ -66,8 +66,8 @@ DynamicPlot::DynamicPlot(QWidget *parent, const QString fileName) :
 
     //QVector<QVector<QCPGraphData>> data;
 
-    // calculatesPropertyValue(data, curveProperties);
-    //    getXYLowerAndUpper(data);
+    //calculatesPropertyValue(data, curveProperties);
+    //getXYLowerAndUpper(data);
 
     myCustomPlot = ui->plotWidget;
 
@@ -78,6 +78,7 @@ DynamicPlot::DynamicPlot(QWidget *parent, const QString fileName) :
 
     //设置属性表
     setAxisProperties();
+    //所有的属性都存在QMap<QString, T> styleFileVariables
     setStyleFileVariables();
     //------------------------------
     side_widget_flag = false;
@@ -100,7 +101,47 @@ DynamicPlot::DynamicPlot(QWidget *parent, const QString fileName) :
 
 
 }
+//更新plotwidget中的结构体
+void DynamicPlot::update_property_struct(PLOT_PROPERTY *p)
+{
+    p->background0 = this->background0;
+    p->background1 = this->background1;
+    p->xBasePen = this->xBasePen;
+    p->yBasePen = this->yBasePen;
+    p->basePenWidth=this->basePenWidth;
+    p->tickPen = this->tickPen;
+    p->labelPen=this->labelPen;
+    p->labelSize=this->labelSize;
+    p->xGridPen=this->xGridPen;
+    p->yGridPen=this->yGridPen;
+    p->xSubGridPen=this->xSubGridPen;
+    p->ySubGridPen=this->ySubGridPen;
+    p->xSubGridVisible=this->xSubGridVisible;
+    p->ySubGridVisible=this->ySubGridVisible;
+    p->gridPenStyle=this->gridPenStyle;
+    p->subGridPenStyle=this->subGridPenStyle;
+    p->zeroLinePen=this->zeroLinePen;
+    p->xAxisName=this->xAxisName;
+    p->yAxisName=this->yAxisName;
+    p->xAxisUnit=this->xAxisUnit;
+    p->yAxisUnit=this->yAxisUnit;
+    p->xAxisUpper=this->xAxisUpper;
+    p->yAxisUpper=this->yAxisUpper;
+    p->xAxisLower=this->xAxisLower;
+    p->yAxisLower=this->yAxisLower;
+    p->linesName=this->line_name;
+    p->lineVisible=this->lineVisible[0];
+    p->linesColor=this->linesColor[0];
+    p->linesWidth=this->linesWidth[0];
+    p->linePenStyle=this->linePenStyle[0];
+    p->lineStyle=this->lineStyle[0];
+    p->lineScatterStyle=this->lineScatterStyle[0];
 
+    //因为在dynamicplot中属性会改变所以dynamicplot类中必须要这个指针随时更新
+    this->my_plot_property = p;
+
+
+}
 void DynamicPlot::setTableVisible()
 {
 
@@ -151,7 +192,7 @@ void DynamicPlot::SetValues(double val)
     //参数含义：position定位的点 doublesize轴的范围大小 alignment对齐方式
     //例如下面这个setRange(sampleNumber, 50, Qt::AlignRight);
     //就解释为：新生成的x这个点一直在右边框，这样就可以一直刷新x轴了
-    ui->plotWidget->xAxis->setRange(sampleNumber, 25, Qt::AlignRight);
+    ui->plotWidget->xAxis->setRange(sampleNumber, this->xAxisUpper, Qt::AlignRight);
 
     ui->plotWidget->replot();
 }
@@ -161,7 +202,7 @@ void DynamicPlot::SetValues(double val)
 void DynamicPlot::AddDatum(double val)
 {
 
-    myGraph[0]->setName(this->line_name);
+    //
 
     ui->plotWidget->graph(0)->addData(sampleNumber,val);
 
@@ -170,7 +211,7 @@ void DynamicPlot::AddDatum(double val)
     //参数含义：position定位的点 doublesize轴的范围大小 alignment对齐方式
     //例如下面这个setRange(sampleNumber, 50, Qt::AlignRight);
     //就解释为：新生成的x这个点一直在右边框，这样就可以一直刷新x轴了
-    ui->plotWidget->xAxis->setRange(sampleNumber, 25, Qt::AlignRight);
+    ui->plotWidget->xAxis->setRange(sampleNumber, this->xAxisUpper, Qt::AlignRight);
 
     ui->plotWidget->replot();
 }
@@ -178,6 +219,7 @@ void DynamicPlot::AddDatum(double val)
 void DynamicPlot::setLineName(QString name)
 {
     this->line_name = name;
+    myGraph[0]->setName(this->line_name);
 }
 //初始化曲线各种属性
 void DynamicPlot::Initialize(void)
@@ -253,7 +295,7 @@ void DynamicPlot::drawing_Initialize(QCustomPlot* customPlot)
     QSharedPointer<QCPAxisTickerDateTime> timeTicker(new QCPAxisTickerDateTime); //时间日期作为X轴
     timeTicker->setDateTimeFormat("ss");
     customPlot->xAxis->setTicker(timeTicker);
-    customPlot->xAxis->setRange(0, 500);
+    customPlot->xAxis->setRange(0, this->xAxisUpper);
 
     customPlot->axisRect()->setupFullAxesBox();
     //移除右上方曲线
@@ -261,7 +303,7 @@ void DynamicPlot::drawing_Initialize(QCustomPlot* customPlot)
     customPlot->axisRect()->removeAxis(customPlot->axisRect()->axis(QCPAxis::atTop));
 
     //设置y轴范围！！
-    customPlot->yAxis->setRange(0, 10);
+    customPlot->yAxis->setRange(0, this->yAxisUpper);
 
     //设置字体
     customPlot->setFont(QFont(font().family(), labelSize));
@@ -480,6 +522,8 @@ void DynamicPlot::init()
     enumManagerLines.resize(linesNum);
 }
 
+
+//读样式文件
 void DynamicPlot::readPropertiesFile(const QString fName)
 {
     if (fName.isEmpty())
@@ -661,6 +705,9 @@ void DynamicPlot::readPropertiesFile(const QString fName)
     }
 }
 
+
+
+//保存配置文件
 void DynamicPlot::writePropertiesFile(QString fName)
 {
     if (fName.isEmpty())
@@ -859,6 +906,7 @@ void DynamicPlot::addLineGraph(QCustomPlot* customPlot,  const int index)
     myGraph[index]->setAntialiasedFill(true);  //设置抗锯齿
 
     //设置曲线名字
+
     myGraph[index]->setName(linesName[index]);
     if (0 == index)
     {
@@ -1270,6 +1318,7 @@ void DynamicPlot::setCurveProperties(const QVector<QVector<double>> &vec)
 
 void DynamicPlot::axisValueChanged(QtProperty *property, const QVariant &value)
 {
+
     AXIS_EPROPERTIES_NAME propertyName = axisProperties[property].first;
     switch (propertyName)
     {
@@ -1408,6 +1457,7 @@ void DynamicPlot::axisValueChanged(QtProperty *property, const QVariant &value)
 
 void DynamicPlot::lineValueChanged(QtProperty *property, const QVariant &value)
 {
+
     if (linesProperties.find(property) == linesProperties.end())
     {
         return;
@@ -1440,6 +1490,7 @@ void DynamicPlot::lineValueChanged(QtProperty *property, const QVariant &value)
 
 void DynamicPlot::enumValueChanged(QtProperty *property, int val)
 {
+
     EnumPropertyIndex enumIndex = enumProperties[property];
     curLineIndex = enumIndex.second;
     switch (enumIndex.first)
@@ -1477,6 +1528,69 @@ void DynamicPlot::setBackgrand()
     myCustomPlot->setBackground(plotGradient);
 }
 
+//通过结构体更新属性
+void DynamicPlot::update_Axis_line_enum_properties(PLOT_PROPERTY *plot_property)
+{
+    //updateAxisProperties
+
+    QLinearGradient plotGradient;
+    plotGradient.setStart(0, 0);
+    plotGradient.setFinalStop(0, 350);
+    plotGradient.setColorAt(0, plot_property->background0);
+    plotGradient.setColorAt(1, plot_property->background1);
+    myCustomPlot->setBackground(plotGradient);
+    myCustomPlot->xAxis->setLabel(plot_property->xAxisName + "(" + plot_property->xAxisUnit + ")");
+    myCustomPlot->xAxis->setLabel(plot_property->xAxisName + "(" + plot_property->xAxisUnit + ")");
+    myCustomPlot->yAxis->setLabel(plot_property->yAxisName + "(" + plot_property->yAxisUnit + ")");
+    myCustomPlot->yAxis->setLabel(plot_property->yAxisName + "(" + plot_property->yAxisUnit + ")");
+    myCustomPlot->xAxis->setRange(plot_property->xAxisLower, plot_property->xAxisUpper);
+    myCustomPlot->yAxis->setRange(plot_property->yAxisLower, plot_property->yAxisUpper);
+    myCustomPlot->xAxis->grid()->setPen(QPen(plot_property->xGridPen, 2, plot_property->gridPenStyle));
+    myCustomPlot->yAxis->grid()->setPen(QPen(plot_property->yGridPen, 2, plot_property->gridPenStyle));
+    myCustomPlot->xAxis->grid()->setSubGridPen(QPen(plot_property->xSubGridPen, 1, plot_property->subGridPenStyle));
+    myCustomPlot->yAxis->grid()->setSubGridPen(QPen(plot_property->ySubGridPen, 1, plot_property->subGridPenStyle));
+    myCustomPlot->xAxis->grid()->setZeroLinePen(QPen(plot_property->zeroLinePen));
+    myCustomPlot->yAxis->grid()->setZeroLinePen(QPen(plot_property->zeroLinePen));
+    myCustomPlot->xAxis->setBasePen(QPen(plot_property->xBasePen, plot_property->basePenWidth));
+    myCustomPlot->yAxis->setBasePen(QPen(plot_property->yBasePen, plot_property->basePenWidth));
+    myCustomPlot->xAxis->setTickPen(QPen(plot_property->tickPen, 2));
+    myCustomPlot->xAxis->setSubTickPen(QPen(plot_property->tickPen, 1));
+    myCustomPlot->yAxis->setTickPen(QPen(plot_property->tickPen, 2));
+    myCustomPlot->yAxis->setSubTickPen(QPen(plot_property->tickPen, 1));
+    myCustomPlot->xAxis->setTickLabelColor(plot_property->labelPen);
+    myCustomPlot->xAxis->setLabelColor(plot_property->labelPen);
+    myCustomPlot->yAxis->setTickLabelColor(plot_property->labelPen);
+    myCustomPlot->yAxis->setLabelColor(plot_property->labelPen);
+    myCustomPlot->xAxis->setLabelFont(QFont(font().family(), plot_property->labelSize));
+    myCustomPlot->yAxis->setLabelFont(QFont(font().family(), plot_property->labelSize));
+    myCustomPlot->xAxis->grid()->setSubGridVisible(plot_property->xSubGridVisible);
+    myCustomPlot->yAxis->grid()->setSubGridVisible(plot_property->ySubGridVisible);
+
+    //updateLineProperties
+    myGraph[0]->setVisible(plot_property->lineVisible);
+
+    myGraph[0]->setName(plot_property->linesName);
+
+    linesPen[0].setWidth(plot_property->linesWidth);//曲线粗细
+    //结构体中没有pen成员这没改动，可能存在问题
+    //myGraph[0]->setPen(linesPen[0]);
+    linesPen[0].setColor(plot_property->linesColor);     //曲线颜色
+    //myGraph[0]->setPen(linesPen[0]);
+
+    //updateEnumProperties
+    linesPen[0].setStyle(plot_property->linePenStyle);
+    myGraph[0]->setPen(linesPen[0]);
+
+    myGraph[0]->setLineStyle(plot_property->lineStyle);
+    myGraph[0]->setScatterStyle(QCPScatterStyle(plot_property->lineScatterStyle ,scatterSize));
+    myCustomPlot->xAxis->grid()->setPen(QPen(plot_property->xGridPen, 2, plot_property->gridPenStyle));
+    myCustomPlot->yAxis->grid()->setPen(QPen(yGridPen, 2, gridPenStyle));
+    myCustomPlot->xAxis->grid()->setSubGridPen(QPen(plot_property->xSubGridPen, 1, plot_property->subGridPenStyle));
+    myCustomPlot->yAxis->grid()->setSubGridPen(QPen(plot_property->ySubGridPen, 1, plot_property->subGridPenStyle));
+
+    //myCustomPlot->replot(QCustomPlot::rpQueuedReplot);
+
+}
 void DynamicPlot::updateAxisProperties(const AXIS_EPROPERTIES_NAME propertyName)
 {
     switch (propertyName) {
@@ -1540,6 +1654,7 @@ void DynamicPlot::updateAxisProperties(const AXIS_EPROPERTIES_NAME propertyName)
         myCustomPlot->yAxis->setBasePen(QPen(yBasePen, basePenWidth));
         break;
     case AXIS_EPROPERTIES_NAME::TICK_PEN:
+
         myCustomPlot->xAxis->setTickPen(QPen(tickPen, 2));
         myCustomPlot->xAxis->setSubTickPen(QPen(tickPen, 1));
         myCustomPlot->yAxis->setTickPen(QPen(tickPen, 2));
@@ -1563,10 +1678,14 @@ void DynamicPlot::updateAxisProperties(const AXIS_EPROPERTIES_NAME propertyName)
         break;
     }
     myCustomPlot->replot(QCustomPlot::rpQueuedReplot);
+
+    //若属性有变则更新结构体
+    update_property_struct(this->my_plot_property);
 }
 
 void DynamicPlot::updateLineProperties(const LINE_EPROPERTIES_NAME propertyName)
 {
+
     switch (propertyName)
     {
     case LINE_EPROPERTIES_NAME::LINE_VISIBLE:
@@ -1585,6 +1704,8 @@ void DynamicPlot::updateLineProperties(const LINE_EPROPERTIES_NAME propertyName)
         break;
     }
     myCustomPlot->replot(QCustomPlot::rpQueuedReplot);
+    //若属性有变则更新结构体
+    update_property_struct(this->my_plot_property);
 }
 
 void DynamicPlot::updateEnumProperties(const ENUM_EPROPERTIES_NAME propertyName)
@@ -1610,18 +1731,18 @@ void DynamicPlot::updateEnumProperties(const ENUM_EPROPERTIES_NAME propertyName)
         break;
     }
     myCustomPlot->replot(QCustomPlot::rpQueuedReplot);
+    //若属性有变则更新结构体
+    update_property_struct(this->my_plot_property);
 }
 
 void DynamicPlot::updateRange(const double xLower, const double xUpper, const double yLower, const double yUpper)
 {
-    cutArrs(data, dataForMagnify, xLower, xUpper, yLower, yUpper);
+
+    //cutArrs(data, dataForMagnify, xLower, xUpper, yLower, yUpper);
     calculatesPropertyValue(dataForMagnify, curvePropertiesFM);
     setCurveProperties(curvePropertiesFM);
-    if (!isMagnify)
-    {
-        myCustomPlot->xAxis->setRange(xLower, xUpper);
-        myCustomPlot->yAxis->setRange(yLower, yUpper);
-    }
+    myCustomPlot->xAxis->setRange(xLower, xUpper);
+    myCustomPlot->yAxis->setRange(yLower, yUpper);
 
 }
 
@@ -1968,20 +2089,20 @@ void DynamicPlot::closeEvent(QCloseEvent *event)
 {
     event->accept();
 }
-
+//读配置文件
 void DynamicPlot::on_action_open_triggered()
 {
     styleFileName = QFileDialog::getOpenFileName(this, tr("选择样式文件"), "", tr("TEXT(*.txt)"));
     if (!styleFileName.isEmpty())
         readPropertiesFile(styleFileName);
 }
-
+//保存配置文件
 void DynamicPlot::on_action_save_triggered()
 {
-    if (styleFileName.isEmpty())
-    {
-        styleFileName = QFileDialog::getSaveFileName(this, tr("保存样式文件"), styleFileName, tr("TEXT(*.txt)"));
-    }
+    //    if (styleFileName.isEmpty())
+    //    {
+    //        styleFileName = QFileDialog::getSaveFileName(this, tr("保存样式文件"), styleFileName, tr("TEXT(*.txt)"));
+    //    }
     writePropertiesFile(styleFileName);
 }
 

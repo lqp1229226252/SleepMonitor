@@ -32,6 +32,7 @@ public:
     void get_plotwidget_position(void);
     bool event(QEvent *e);
 
+
 private:
     Ui::EEGWnd *ui;
     QVector<PlotWidget*> m_PlotWidgetPtrs;

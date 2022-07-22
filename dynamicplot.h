@@ -79,6 +79,7 @@ public:
     void drawing_Initialize(QCustomPlot* customPlot);
     void SetValues(double val);
     void AddDatum(double val);
+
     //上层调用这个函数设置曲线名称
     void setLineName(QString name);
     void setXYvisbile(bool f);
@@ -92,6 +93,10 @@ public:
     void lineValueChanged(QtProperty* property, const QVariant& value);
     void enumValueChanged (QtProperty *property, int val);
     void setBackgrand();
+    //通过结构体更新属性
+    void update_Axis_line_enum_properties(PLOT_PROPERTY *plot_property);
+    void my_updateAxisProperties(void);
+
     void updateAxisProperties(const AXIS_EPROPERTIES_NAME propertyName);
     void updateLineProperties(const LINE_EPROPERTIES_NAME propertyName);
     void updateEnumProperties(const ENUM_EPROPERTIES_NAME propertyName);
@@ -107,6 +112,8 @@ public:
     //自己加入
     void timerEvent(QTimerEvent *event);
     bool flag_setTableVisible=false;
+    //更新property struct
+    void update_property_struct(PLOT_PROPERTY *plot_property);
 
 
 
@@ -145,8 +152,8 @@ protected:
     QHBoxLayout *vLayoutToolBar;
     QWidget *sideToolBar;
 
-    QMap<QString, T> styleFileVariables;
-    QVector<QMap<QString, T>> styleFileVarForLines;
+    QMap<QString, T> styleFileVariables;//保存坐标轴背景属性
+    QVector<QMap<QString, T>> styleFileVarForLines;//曲线属性vector长度为1
 
     bool side_widget_flag;
     bool buttonRelesed;
@@ -184,6 +191,8 @@ private:
     Ui::DynamicPlot *ui;
 
     bool magnifyForNewWindow;
+
+    PLOT_PROPERTY *my_plot_property;
 
     QString fileName;
     QString styleFileName;

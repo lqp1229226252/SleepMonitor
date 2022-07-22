@@ -47,17 +47,33 @@ SensorData::SensorData(QObject *object):QObject(object)
 void SensorData::appendData(QByteArray pData)
 {
     this->catData(pData);
-    if(findBufHead())
-    {
-        if(findBufEnd())
-        {
-            qDebug()<<"开始解析";
-            QByteArray buffer=getBuffer();
-            paraData(buffer);
-            int buf_len=buffer[1]+(buffer[2]<<8);
-            calPacketLossRate(buffer[buf_len-2]);
+
+    for (auto i:pData){
+
+        if (i!=32){
+            nums.append(double(i-48));
+//            qDebug()<<"SensorData::appendData"<<i;
+            if (nums.size() == 16){
+                emit (dataSignal(nums));
+            }
+        }
+        if (nums.size() == 16){
+            emit (dataSignal(nums));
+            nums.clear();
         }
     }
+
+//    if(findBufHead())
+//    {
+//        if(findBufEnd())
+//        {
+//            qDebug()<<"开始解析";
+//            QByteArray buffer=getBuffer();
+//            paraData(buffer);
+//            int buf_len=buffer[1]+(buffer[2]<<8);
+//            calPacketLossRate(buffer[buf_len-2]);
+//        }
+//    }
 }
 
 void SensorData::setCtrlData(int nFP,int n_Snore,int n_Light,int n_GroAcc)
@@ -146,7 +162,7 @@ void SensorData::paraData(QByteArray buffer)
     {
         QByteArray data=getdata(buffer,4,buffer.size()-3);
         paraAllData(data);
-        emit(dataSignal(data));
+//        emit(dataSignal(data));
     }
     if(code==0x01)
     {

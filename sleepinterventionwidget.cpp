@@ -6,7 +6,11 @@ SleepInterventionWidget::SleepInterventionWidget(QWidget *parent) :
     ui(new Ui::SleepInterventionWidget)
 {
     ui->setupUi(this);
-    
+    init_buf();
+}
+
+void SleepInterventionWidget::get_commSetWidget(CommSetWidget *commSetWidget_1){
+    commSetWidget=commSetWidget_1;
 }
 
 SleepInterventionWidget::~SleepInterventionWidget()
@@ -34,7 +38,8 @@ void SleepInterventionWidget::read_data()
 void SleepInterventionWidget::cal_verify()
 {
     int sum=this->buf_head;
-    sum+=this->buf_len;
+    sum+=quint8(this->buf_len&0xFF);
+    sum+=(this->buf_len>>8);
     sum+=this->buf_code;
     sum+=this->buf_amplitude_data;
     sum+=this->buf_timedata;
@@ -66,4 +71,5 @@ void SleepInterventionWidget::on_send_clicked()
     QByteArray buffer=enCode();
 //    qDebug()<<buffer;
     emit(sendSignal(buffer));
+//    commSetWidget->write("SleepInterventionWidget send command",buffer);
 }

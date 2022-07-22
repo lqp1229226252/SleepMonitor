@@ -1,6 +1,8 @@
 QT       += core gui
+QT       +=serialport
+QT       +=charts
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 CONFIG += c++11
 
@@ -16,16 +18,63 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ContralDataWidget.cpp \
+    ControlWnd.cpp \
+    commsetwidget.cpp \
+    controldata.cpp \
+    dynamicplot.cpp \
+    eegwnd.cpp \
+    filepath.cpp \
+    helpers.cpp \
+    magnifywindow.cpp \
     main.cpp \
+    myenumpropertymanager.cpp \
+    mytracer.cpp \
+    outputwnd.cpp \
+    plotwidget.cpp \
+    qcustomplot.cpp \
+    sensordata.cpp \
+    sleepinterventionwidget.cpp \
     sleepmonitor.cpp
 
 HEADERS += \
-    sleepmonitor.h
+    ContralDataWidget.h \
+    ControlWnd.h \
+    commsetwidget.h \
+    controldata.h \
+    dynamicplot.h \
+    eegwnd.h \
+    filepath.h \
+    helpers.h \
+    magnifywindow.h \
+    myenumpropertymanager.h \
+    mytracer.h \
+    outputwnd.h \
+    plotwidget.h \
+    qcustomplot.h \
+    sensordata.h \
+    sleepinterventionwidget.h \
+    sleepmonitor.h \
+    struct_data.h
 
 FORMS += \
+    ControlWnd.ui \
+    commsetwidget.ui \
+    dynamicplot.ui \
+    eegwnd.ui \
+    filepath.ui \
+    magnifywindow.ui \
+    outputwnd.ui \
+    plotwidget.ui \
+    sleepinterventionwidget.ui \
     sleepmonitor.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+include($$[QT_INSTALL_PREFIX]/../Src/qttools/src/shared/qtpropertybrowser/qtpropertybrowser.pri)
+
+RESOURCES += \
+    res.qrc

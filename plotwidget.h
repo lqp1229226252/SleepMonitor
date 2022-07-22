@@ -2,10 +2,24 @@
 #define PLOTWIDGET_H
 
 #include <QWidget>
+#include "qcustomplot.h"
+#include "helpers.h"
 
 namespace Ui {
 class PlotWidget;
 }
+enum my_PenStyle { // pen style
+    NoPen,
+    SolidLine,
+    DashLine,
+    DotLine,
+    DashDotLine,
+    DashDotDotLine,
+    CustomDashLine
+#ifndef Q_MOC_RUN
+    , MPenStyle = 0x0f
+#endif
+};
 
 class PlotWidget : public QWidget
 {
@@ -36,6 +50,14 @@ public:
     void get_EEGWnd_Size(QSize size);
     //获取自己最新的相对位置
     void get_newest_position_from_EEGWnd(QRect rect);
+    //把perporty结构体中的数据保存在ini文件中
+    void SaveConfig(void);
+    //从配置文件中读内容到property结构体中
+    void ReadConfig(void);
+    //更新属性配置结构体
+    void updata_property_struct(void);
+    QString colorToString(const QColor color);
+    QColor stringToColor(const QString str);
 
 private slots:
     void clicked_maxmum(void);
@@ -52,6 +74,10 @@ private:
     QSize PlotWidget_size;
     //自己相对于EEGWnd最新的位置
     QRect position_in_EEGWnd;
+
+    //曲线的属性结构体
+    PLOT_PROPERTY m_Property;
+
 };
 
 #endif // PLOTWIDGET_H
