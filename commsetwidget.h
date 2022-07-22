@@ -22,6 +22,7 @@ public:
     void write(QByteArray);
     void messageBox(QString str);
     void setCtrlData(int,int,int,int);
+    QStringList getAllPath();
 signals:
     void dataSignal(QByteArray);
     void stataSignal(QByteArray);

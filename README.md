@@ -21,7 +21,9 @@ int的参数表示哪个文件
 2:angel_acc
 3:snore
 4:gro_acc
+QStringlist getAllPath()//获取文件的全部路径 
 ```
+
 ## 文件转存
 ```
 fileStorageState(bool) //true表示发送开始转存，false表示结束转存储

@@ -100,6 +100,17 @@ void CommSetWidget::setCtrlData(int nFP, int nSnore, int nLight, int nGroAcc)
 {
     this->sensordata.setCtrlData(nFP,nSnore,nLight,nGroAcc);
 }
+
+QStringList CommSetWidget::getAllPath()
+{
+    QStringList list;
+    list.append(filepath->getFPPath());
+    list.append(filepath->getLightPath());
+    list.append(filepath->getAngleAccPath());
+    list.append(filepath->getSnorePath());
+    list.append(filepath->getGroAccPath());
+    return list;
+}
 void CommSetWidget::on_start_clicked()
 {
     QString portname=ui->serial->currentText();
@@ -151,6 +162,7 @@ void CommSetWidget::on_stop_clicked()
 void CommSetWidget::on_serial_detect_clicked()
 {
     ui->serial->clear();
+    this->serialnames.clear();
     //获取全部串口信息
     QList<QSerialPortInfo> infos=QSerialPortInfo::availablePorts();
     //将检测的串口名字插入serialnames
@@ -224,7 +236,7 @@ void CommSetWidget::updatafilePath()
     list.append(filepath->getLightPath());
     list.append(filepath->getAngleAccPath());
     list.append(filepath->getSnorePath());
-    list.append(filepath->getGroAcc());
+    list.append(filepath->getGroAccPath());
 //    qDebug()<<list;
     emit(FilePathChange(list));
 }
