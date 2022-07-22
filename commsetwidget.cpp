@@ -20,9 +20,13 @@ CommSetWidget::CommSetWidget(QWidget *parent) :
     on_serial_detect_clicked();
     connect(serial,SIGNAL(readyRead()),this,SLOT(readData()));
     connect(serial,SIGNAL(errorOccurred(QSerialPort::SerialPortError)),this,SLOT(dealError(QSerialPort::SerialPortError)));
+    //sensordata的信号
     connect(&sensordata,SIGNAL(dataSignal(QByteArray)),this,SLOT(dataSlot(QByteArray)));
     connect(&sensordata,SIGNAL(stataSignal(QByteArray)),this,SLOT(stataSlot(QByteArray)));
+    connect(&sensordata,SIGNAL(dataSignal(QVector<double>)),this,SLOT(dataSlot(QVector<double>)));
+    connect(&sensordata,SIGNAL(stataSignal(STATE_DATA)),this,SLOT(stataSlot(STATE_DATA)));
     connect(&sensordata,SIGNAL(lossRateChange(float)),this,SLOT(lossRateChangeSlot(float)));
+    //文件路径设置窗口信号
     connect(filepath,SIGNAL(close()),this,SLOT(updatafilePath()));
     connect(filepath,SIGNAL(PathChang(int,QString)),this,SLOT(updatefilePath(int,QString)));
 }
@@ -205,6 +209,16 @@ void CommSetWidget::dataSlot(QByteArray data)
 void CommSetWidget::stataSlot(QByteArray data)
 {
     qDebug()<<data;
+    emit(stataSignal(data));
+}
+
+void CommSetWidget::dataSlot(QVector<double> data)
+{
+    emit(dataSignal(data));
+}
+
+void CommSetWidget::stataSlot(STATE_DATA data)
+{
     emit(stataSignal(data));
 }
 

@@ -17,7 +17,9 @@ public:
     int getGroAccNum();
 signals:
     void dataSignal(QByteArray);
+    void dataSignal(QVector<double>);
     void stataSignal(QByteArray);
+    void stataSignal(STATE_DATA);
     void lossRateChange(float);
 public slots:
 private:

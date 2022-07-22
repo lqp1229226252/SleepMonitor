@@ -26,6 +26,8 @@ public:
 signals:
     void dataSignal(QByteArray);
     void stataSignal(QByteArray);
+    void dataSignal(QVector<double>);
+    void stataSignal(STATE_DATA);
     void lossRateChange(float);
     void fileStorageState(bool);
     void FilePathChange(QStringList);
@@ -44,6 +46,8 @@ private slots:
 
     void dataSlot(QByteArray);
     void stataSlot(QByteArray);
+    void dataSlot(QVector<double>);
+    void stataSlot(STATE_DATA);
     void lossRateChangeSlot(float);
 
     void on_file_set_clicked();
