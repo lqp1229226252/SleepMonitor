@@ -70,7 +70,8 @@ public:
     void setSize(int w,int h);
     void setSDAmount();
     SD_AMOUNT getSensorDataAmount();
-    CTRL_DATA getCtrlData();
+//    CTRL_DATA getCtrlData();
+    ControlData *getCtrlData();
 signals:
     void sendSingal(QByteArray);
 public slots:
@@ -120,7 +121,6 @@ private:
     uint8_t   buf_end;
 
     ControlData ctrldata;
-
 };
 
 #endif // Widget_H
