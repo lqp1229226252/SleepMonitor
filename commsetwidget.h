@@ -1,4 +1,4 @@
-﻿#ifndef COMMSETWND_H
+#ifndef COMMSETWND_H
 #define COMMSETWND_H
 
 #include <QWidget>
@@ -22,9 +22,12 @@ public:
     void write(QByteArray);
     void messageBox(QString str);
     void setCtrlData(int,int,int,int);
+    QStringList getAllPath();
 signals:
-    void dataSignal(QVector<double>);
+    void dataSignal(QByteArray);
     void stataSignal(QByteArray);
+    void dataSignal(QVector<double>);
+    void stataSignal(STATE_DATA);
     void lossRateChange(float);
     void fileStorageState(bool);
     void FilePathChange(QStringList);
@@ -41,8 +44,10 @@ private slots:
     void readData();
     void dealError(QSerialPort::SerialPortError);
 
-    void dataSlot(QVector<double>);
+    void dataSlot(QByteArray);
     void stataSlot(QByteArray);
+    void dataSlot(QVector<double>);
+    void stataSlot(STATE_DATA);
     void lossRateChangeSlot(float);
 
     void on_file_set_clicked();

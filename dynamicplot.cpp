@@ -77,7 +77,7 @@ DynamicPlot::DynamicPlot(QWidget *parent, const QString fileName) :
     //drawing(myCustomPlot);
 
     //设置属性表
-    setAxisProperties();
+    //setAxisProperties();
     //所有的属性都存在QMap<QString, T> styleFileVariables
     setStyleFileVariables();
     //------------------------------
@@ -129,7 +129,8 @@ void DynamicPlot::update_property_struct(PLOT_PROPERTY *p)
     p->yAxisUpper=this->yAxisUpper;
     p->xAxisLower=this->xAxisLower;
     p->yAxisLower=this->yAxisLower;
-    p->linesName=this->line_name;
+    //p->linesName=this->line_name;
+    p->linesName = this->linesName[0];
     p->lineVisible=this->lineVisible[0];
     p->linesColor=this->linesColor[0];
     p->linesWidth=this->linesWidth[0];
@@ -219,7 +220,8 @@ void DynamicPlot::AddDatum(double val)
 void DynamicPlot::setLineName(QString name)
 {
     this->line_name = name;
-    myGraph[0]->setName(this->line_name);
+    this->linesName[0]=name;
+    myGraph[0]->setName(name);
 }
 //初始化曲线各种属性
 void DynamicPlot::Initialize(void)
@@ -1163,7 +1165,7 @@ void DynamicPlot::setAxisProperties()
 
     for (int i = 0; i < linesNum; ++i)
     {
-        setLineProperties(i);
+        //setLineProperties(i);
     }
 }
 
@@ -1182,6 +1184,7 @@ void DynamicPlot::setLineProperties(const int index)
     QtProperty* propertyBar = pVarManager->addProperty(QtVariantPropertyManager::groupTypeId(), tempName.toUtf8());
     QtVariantProperty* item = pVarManager->addProperty(QVariant::String, QStringLiteral("曲线名称"));
     item->setValue(linesName[index]);
+
     LinePropertyIndex lineIndex;
     lineIndex.first = LINE_EPROPERTIES_NAME::LINES_NAME;
     lineIndex.second = index;
@@ -1210,6 +1213,7 @@ void DynamicPlot::setLineProperties(const int index)
 
     item = pVarManager->addProperty(QVariant::Int, QStringLiteral("曲线宽度"));
     item->setValue(linesWidth[index]);
+    //qDebug()<<"曲线宽带debug :"<<linesWidth[index];
     lineIndex.first = LINE_EPROPERTIES_NAME::LINE_WIDTH;
     lineIndex.second = index;
     lineIndex.variableName = item->propertyName();
@@ -1589,6 +1593,50 @@ void DynamicPlot::update_Axis_line_enum_properties(PLOT_PROPERTY *plot_property)
     myCustomPlot->yAxis->grid()->setSubGridPen(QPen(plot_property->ySubGridPen, 1, plot_property->subGridPenStyle));
 
     //myCustomPlot->replot(QCustomPlot::rpQueuedReplot);
+
+    //用结构体的属性值更新绘图之后必须还要更新右侧属性栏里面的内容不然属性栏还是初始的值
+    //功能和dynamicplot中成员函数 update_struct_property反着的
+    this->background0 = plot_property->background0;
+    this->background1 = plot_property->background1;
+    this->xBasePen = plot_property->xBasePen;
+    this->yBasePen = plot_property->yBasePen;
+    this->basePenWidth=plot_property->basePenWidth;
+    this->tickPen=plot_property->tickPen;
+    this->labelPen=plot_property->labelPen;
+    labelSize=plot_property->labelSize;
+    xGridPen=plot_property->xGridPen;
+    yGridPen=plot_property->yGridPen;
+    xSubGridPen=plot_property->xSubGridPen;
+    xSubGridPen=plot_property->ySubGridPen;
+    xSubGridPen=plot_property->xSubGridVisible;
+    xSubGridPen=plot_property->ySubGridVisible;
+    gridPenStyle=plot_property->gridPenStyle;
+    subGridPenStyle=plot_property->subGridPenStyle;
+    zeroLinePen =plot_property->zeroLinePen;
+    xAxisName= plot_property->xAxisName;
+    yAxisName= plot_property->yAxisName;
+    xAxisUnit = plot_property->xAxisUnit;
+    yAxisUnit= plot_property->yAxisUnit;
+    xAxisUpper= plot_property->xAxisUpper;
+    yAxisUpper =plot_property->yAxisUpper;
+    xAxisLower =plot_property->xAxisLower;
+    yAxisLower =plot_property->yAxisLower;
+    //p->linesName=this->line_name;
+    linesName[0]= plot_property->linesName ;
+    lineVisible[0]= plot_property->lineVisible;
+    linesColor[0] =plot_property->linesColor;
+    linesWidth[0] =plot_property->linesWidth;
+    linePenStyle[0]=plot_property->linePenStyle;
+    lineStyle[0] =plot_property->lineStyle;
+    lineScatterStyle[0]= plot_property->lineScatterStyle;
+    //让config文件中的属性同步到头文件代码中再调用更新属性让右侧属性更新成文件中的属性值
+    this->setAxisProperties();
+    this->setLineProperties(0);
+
+
+
+
+
 
 }
 void DynamicPlot::updateAxisProperties(const AXIS_EPROPERTIES_NAME propertyName)

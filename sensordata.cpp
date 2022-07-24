@@ -1,4 +1,6 @@
-﻿#include "sensorData.h"
+﻿
+#include "sensordata.h"
+
 #include "malloc.h"
 #define MAX_LENGTH 100
 #include "math.h"
@@ -47,33 +49,17 @@ SensorData::SensorData(QObject *object):QObject(object)
 void SensorData::appendData(QByteArray pData)
 {
     this->catData(pData);
-
-    for (auto i:pData){
-
-        if (i!=32){
-            nums.append(double(i-48));
-//            qDebug()<<"SensorData::appendData"<<i;
-            if (nums.size() == 16){
-                emit (dataSignal(nums));
-            }
-        }
-        if (nums.size() == 16){
-            emit (dataSignal(nums));
-            nums.clear();
+    if(findBufHead())
+    {
+        if(findBufEnd())
+        {
+            qDebug()<<"开始解析";
+            QByteArray buffer=getBuffer();
+            paraData(buffer);
+            int buf_len=buffer[1]+(buffer[2]<<8);
+            calPacketLossRate(buffer[buf_len-2]);
         }
     }
-
-//    if(findBufHead())
-//    {
-//        if(findBufEnd())
-//        {
-//            qDebug()<<"开始解析";
-//            QByteArray buffer=getBuffer();
-//            paraData(buffer);
-//            int buf_len=buffer[1]+(buffer[2]<<8);
-//            calPacketLossRate(buffer[buf_len-2]);
-//        }
-//    }
 }
 
 void SensorData::setCtrlData(int nFP,int n_Snore,int n_Light,int n_GroAcc)
@@ -162,7 +148,7 @@ void SensorData::paraData(QByteArray buffer)
     {
         QByteArray data=getdata(buffer,4,buffer.size()-3);
         paraAllData(data);
-//        emit(dataSignal(data));
+        emit(dataSignal(data));
     }
     if(code==0x01)
     {
@@ -170,6 +156,7 @@ void SensorData::paraData(QByteArray buffer)
         STATE_DATA stata_data=paraStateData(data);
         //插入
         insertData(this->m_vStateData,stata_data);
+        emit(stataSignal(stata_data));
         emit(stataSignal(data));
     }
 }
@@ -186,64 +173,85 @@ void SensorData::paraAllData(QByteArray buffer)
 {
     int index=0;
     QByteArray data;
+    QVector<double> vector(m_nFP*2+m_nLight*3+m_nSnore*2+3+m_nGroAcc*6);
     //插入FP1数据
+    int data_index=0;
     for(int i=0;i<m_nFP;i++)
     {
          data=getdata(buffer,index,index+4);
          SD_FP fp1=paraFPData(data);
+         vector[data_index]=fp1.dbVal;
          insertData(this->m_vFP1,fp1);
          index+=4;
+         data_index++;
+
     }
     //插入FP2数据
     for(int i=0;i<m_nFP;i++)
     {
          data=getdata(buffer,index,index+4);
          SD_FP fp2=paraFPData(data);
+         vector[data_index]=fp2.dbVal;
          insertData(this->m_vFP2,fp2);
          index+=4;
+         data_index++;
          updateFPAmount();
+
     }
     //解析红光数据
     for(int i=0;i<m_nLight;i++)
     {
          data=getdata(buffer,index,index+3);
          SD_LIGTH light_red=paraLightData(data);
+         vector[data_index]=light_red.dbVal;
          insertData(this->m_vRedLight,light_red);
          index+=3;
+         data_index++;
+
     }
     //解析近红光数据
     for(int i=0;i<m_nLight;i++)
     {
          data=getdata(buffer,index,index+3);
          SD_LIGTH light_near_red=paraLightData(data);
+         vector[data_index]=light_near_red.dbVal;
          insertData(this->m_vNearRedLight,light_near_red);
          index+=3;
+         data_index++;
     }
     //解析绿光数据
     for(int i=0;i<m_nLight;i++)
     {
          data=getdata(buffer,index,index+3);
          SD_LIGTH light_green=paraLightData(data);
+         vector[data_index]=light_green.dbVal;
          insertData(this->m_vGreenLight,light_green);
          index+=3;
+         data_index++;
          updateLightAmount();
     }
 
     //解析坐立角数据
     data=getdata(buffer,index,index+2);
     double seat_angle=paraAngleData(data);
+    vector[data_index]=seat_angle;
     insertData(this->m_vSeatAngle,seat_angle);
     index+=2;
+    data_index++;
     //解析翻滚角数据
-   data=getdata(buffer,index,index+2);
+    data=getdata(buffer,index,index+2);
     double roll_angel=paraAngleData(data);
+    vector[data_index]=roll_angel;
     insertData(this->m_vRollAngle,roll_angel);
     index+=2;
+    data_index++;
     //解析运动加速度数据
     data=getdata(buffer,index,index+2);
     double action_acc=paraActionAccData(data);
+    vector[data_index]=action_acc;
     insertData(this->m_vAcceleration,action_acc);
     index+=2;
+    data_index++;
     updateAngelAccAmount();
 
     for(int i=0;i<m_nSnore;i++)
@@ -251,15 +259,20 @@ void SensorData::paraAllData(QByteArray buffer)
         //解析左鼾声数据
         data=getdata(buffer,index,index+3);
         SD_SNORE snore_left=paraSnoreData(data);
+        vector[data_index]=snore_left.dbVal;
         insertData(this->m_vLSnore,snore_left);
         //解析右鼾声数据
         int right_index=index+m_nSnore*3;
         data=getdata(buffer,right_index,right_index+3);
         SD_SNORE snore_right=paraSnoreData(data);
+        vector[data_index+m_nSnore]=snore_right.dbVal;
         insertData(this->m_vRSnore,snore_right);
+
         index+=3;
+        data_index++;
         updateSnoreAmount();
     }
+    data_index+=m_nSnore;
     index+=m_nSnore*3;
     for(int i=0;i<m_nGroAcc;i++)
     {
@@ -267,34 +280,41 @@ void SensorData::paraAllData(QByteArray buffer)
         data=getdata(buffer,index,index+3);
         SD_GRO gro_x=paraGroData(data);
         insertData(this->m_vXgro,gro_x);
+        vector[data_index]=gro_x.dbVal;
          //解析y-gro数据
         int temp_index=index+m_nGroAcc*3;
         data=getdata(buffer,temp_index,temp_index+3);
         SD_GRO gro_y=paraGroData(data);
         insertData(m_vYgro,gro_y);
+        vector[data_index+m_nGroAcc]=gro_y.dbVal;
          //解析z-gro数据
         temp_index=index+m_nGroAcc*3*2;
         data=getdata(buffer,temp_index,temp_index+3);
         SD_GRO gro_z=paraGroData(data);
-         insertData(m_vZgro,gro_z);
+        insertData(m_vZgro,gro_z);
+        vector[data_index+m_nGroAcc*2]=gro_z.dbVal;
         //解析x-acc数据
          temp_index=index+m_nGroAcc*3*3;
          data=getdata(buffer,temp_index,temp_index+3);
         SD_ACC acc_x=paraAccData(data);
         insertData(m_vXacc,acc_x);
+         vector[data_index+m_nGroAcc*3]=acc_x.dbVal;
          //解析y-acc数据
         temp_index=index+m_nGroAcc*3*4;
         data=getdata(buffer,temp_index,temp_index+3);
         SD_ACC acc_y=paraAccData(data);
         insertData(m_vYacc,acc_y);
+        vector[data_index+m_nGroAcc*4]=acc_y.dbVal;
          //解析z-acc数据
         temp_index=index+m_nGroAcc*3*5;
         data=getdata(buffer,temp_index,temp_index+3);
         SD_ACC acc_z=paraAccData(data);
         insertData(m_vZacc,acc_z);
+        vector[data_index+m_nGroAcc*5]=acc_z.dbVal;
+        data_index++;
         updateGROACCAmount();
     }
-
+    emit(dataSignal(vector));
 
 }
 SD_FP SensorData::paraFPData(QByteArray buffer)

@@ -56,7 +56,7 @@ QString FilePath::getSnorePath()
     return this->snore_Path;
 }
 
-QString FilePath::getGroAcc()
+QString FilePath::getGroAccPath()
 {
     return this->gro_acc_path;
 }

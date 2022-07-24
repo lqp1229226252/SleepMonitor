@@ -8,15 +8,24 @@ PlotWidget::PlotWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     //点击属性按钮，显示和隐藏属性表
-    connect(ui->attribute,&QPushButton::clicked,this,&PlotWidget::clicked_attribute);
+    //connect(ui->attribute,&QPushButton::clicked,this,&PlotWidget::clicked_attribute);
 
     PlotWidget_size = PlotWidget::size();
     //点击最大化按钮，放大这个窗口并且隐藏其他曲线
     connect(ui->maxmum,&QPushButton::clicked,this,&PlotWidget::clicked_maxmum);
     // startTimer(50);
-    ui->attribute->setVisible(false);
+   // ui->attribute->setVisible(false);
     //从dynamicplot类中读取曲线的perporty属性
     //updata_property_struct();
+
+    //设置按钮icon
+    QIcon icon_maxmum;
+    icon_maxmum.addFile(tr(":/image/icon/1.ico"));
+
+    ui->maxmum->setIcon(icon_maxmum);
+    ui->maxmum->setIconSize(QSize(35,35));
+
+    ui->maxmum->setFlat(true);
 }
 
 //从配置文件中读内容到property结构体中
@@ -175,8 +184,27 @@ void PlotWidget::setLineName(QString name)
     //创建存放属性文件夹 在这调用是因为要用id来命令文件夹
     qDebug()<<"linesName :"<<m_Property.linesName;
     //设置完名字后把属性结构体保存在配置文件中
-    SaveConfig();
-    //
+    //如果config文件不存在则先saveconfig把结构体默认值（也就是dynamicplot类中初始化曲线的参数）
+    //先保存在结构体中并且存到配置文件中再readconfig，否则就不执行saveconfig这样就解决了
+    //程序第一次运行的时候使用默认值而非第一次运行时使用配置文件的问题
+    //先判断是否存在配置文件，若不存在则执行saveconfig
+    //首先获取程序的运行目录
+    QString appPath = QDir::currentPath();
+    QString dir_str = appPath;
+    dir_str += "/config";
+    QString plotname = "/plotwidget";
+    plotname += QString::number(this->id);
+    plotname += ".ini";
+    QString tempFilePath = dir_str + plotname;
+    QFileInfo fi(tempFilePath);
+    //文件不存在的情况
+    if(!fi.exists())
+    {
+        qDebug()<<"程序首次运行，无配置文件";
+        SaveConfig();
+    }
+
+
     ReadConfig();
 
 
@@ -247,14 +275,14 @@ void PlotWidget::hide_plotWidget(bool f)
     {
         ui->dynamicplot->setVisible(false);
         //隐藏按钮
-        ui->attribute->setVisible(false);
+        //ui->attribute->setVisible(false);
         ui->maxmum->setVisible(false);
     }
 
     else
     {
         ui->dynamicplot->setVisible(true);
-        ui->attribute->setVisible(false);
+        //ui->attribute->setVisible(false);
         ui->maxmum->setVisible(true);
     }
 
@@ -293,8 +321,8 @@ void PlotWidget::Max_Widget(void)
     //默认显示属性页面
     ui->dynamicplot->setTableVisible();
     //默认显示属性页面，隐藏属性按钮
-    this->ui->attribute->setVisible(false);
-    this->ui->maxmum->setText("恢复");
+    //this->ui->attribute->setVisible(false);
+    //this->ui->maxmum->setText("恢复");
 
     this->setGeometry(0,0,EEGWnd_size.width(), EEGWnd_size.height());
     this->activateWindow();
@@ -324,8 +352,8 @@ void PlotWidget::Recovery_Widget(void)
     //默认显示属性页面
     ui->dynamicplot->setTableVisible();
     //默认显示属性页面，隐藏属性按钮
-    this->ui->attribute->setVisible(false);
-    this->ui->maxmum->setText("放大");
+    //this->ui->attribute->setVisible(false);
+    //this->ui->maxmum->setText("放大");
 
     //用自己在EEGWnd中的位置来恢复放大之前的位置
     this->setGeometry(position_in_EEGWnd.x(),position_in_EEGWnd.y(),position_in_EEGWnd.width(),position_in_EEGWnd.height());
@@ -337,6 +365,7 @@ void PlotWidget::Recovery_Widget(void)
 PlotWidget::~PlotWidget()
 {
     //任务19内容5 保存属性信息到配置文件中
-    SaveConfig();
+    //SaveConfig();
+    //qDebug()<<"plotwidget " <<this->id<<"保存配置文件成功";
     delete ui;
 }

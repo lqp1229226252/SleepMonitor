@@ -20,9 +20,13 @@ CommSetWidget::CommSetWidget(QWidget *parent) :
     on_serial_detect_clicked();
     connect(serial,SIGNAL(readyRead()),this,SLOT(readData()));
     connect(serial,SIGNAL(errorOccurred(QSerialPort::SerialPortError)),this,SLOT(dealError(QSerialPort::SerialPortError)));
-    connect(&sensordata,SIGNAL(dataSignal(QVector<double>)),this,SLOT(dataSlot(QVector<double>)));
+    //sensordata的信号
+    connect(&sensordata,SIGNAL(dataSignal(QByteArray)),this,SLOT(dataSlot(QByteArray)));
     connect(&sensordata,SIGNAL(stataSignal(QByteArray)),this,SLOT(stataSlot(QByteArray)));
+    connect(&sensordata,SIGNAL(dataSignal(QVector<double>)),this,SLOT(dataSlot(QVector<double>)));
+    connect(&sensordata,SIGNAL(stataSignal(STATE_DATA)),this,SLOT(stataSlot(STATE_DATA)));
     connect(&sensordata,SIGNAL(lossRateChange(float)),this,SLOT(lossRateChangeSlot(float)));
+    //文件路径设置窗口信号
     connect(filepath,SIGNAL(close()),this,SLOT(updatafilePath()));
     connect(filepath,SIGNAL(PathChang(int,QString)),this,SLOT(updatefilePath(int,QString)));
 }
@@ -99,6 +103,17 @@ void CommSetWidget::messageBox(QString str)
 void CommSetWidget::setCtrlData(int nFP, int nSnore, int nLight, int nGroAcc)
 {
     this->sensordata.setCtrlData(nFP,nSnore,nLight,nGroAcc);
+}
+
+QStringList CommSetWidget::getAllPath()
+{
+    QStringList list;
+    list.append(filepath->getFPPath());
+    list.append(filepath->getLightPath());
+    list.append(filepath->getAngleAccPath());
+    list.append(filepath->getSnorePath());
+    list.append(filepath->getGroAccPath());
+    return list;
 }
 void CommSetWidget::on_start_clicked()
 {
@@ -179,21 +194,32 @@ void CommSetWidget::dealError(QSerialPort::SerialPortError error)
     }
 }
 
-void CommSetWidget::dataSlot(QVector<double> data)
+void CommSetWidget::dataSlot(QByteArray data)
 {
-    qDebug()<<"CommSetWidget::dataSlot"<<data;
+//    qDebug()<<data;
     emit(dataSignal(data));
 }
 
 void CommSetWidget::stataSlot(QByteArray data)
 {
-    qDebug()<<data;
+//    qDebug()<<data;
+    emit(stataSignal(data));
+}
+
+void CommSetWidget::dataSlot(QVector<double> data)
+{
+//    qDebug()<<data;
+    emit(dataSignal(data));
+}
+
+void CommSetWidget::stataSlot(STATE_DATA data)
+{
     emit(stataSignal(data));
 }
 
 void CommSetWidget::lossRateChangeSlot(float loss)
 {
-    qDebug()<<loss;
+//    qDebug()<<loss;
     emit(lossRateChange(loss));
 }
 
@@ -219,7 +245,7 @@ void CommSetWidget::updatafilePath()
     list.append(filepath->getLightPath());
     list.append(filepath->getAngleAccPath());
     list.append(filepath->getSnorePath());
-    list.append(filepath->getGroAcc());
+    list.append(filepath->getGroAccPath());
 //    qDebug()<<list;
     emit(FilePathChange(list));
 }

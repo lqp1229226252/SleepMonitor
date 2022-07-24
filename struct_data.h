@@ -36,11 +36,11 @@ typedef struct _SD_ACC {
    int nIndex; // 采样序号 
 }SD_ACC;
 typedef struct _STATE_DATA { 
-   unsigned int nVol; // 电池电压，原始单位 20mV，乘以 20 得到该数据 
+   quint16 nVol; // 电池电压，原始单位 20mV，乘以 20 得到该数据
    bool bRecharge; // 充电状态，原始数据为 0、1 
    double dbTemp; // 设备温度，原始单位 0.2，乘以 0.2 得到 
-   unsigned int nTime; // 设定当前时间 
-   unsigned int nCapacity; // 容量，原始单位 2GB，乘以 2 得到 
-   unsigned int nResidual; // 剩余容量，原始单位 2GB，乘以 2 得到 
+   quint32 nTime; // 设定当前时间
+   quint16 nCapacity; // 容量，原始单位 2GB，乘以 2 得到
+   quint16 nResidual; // 剩余容量，原始单位 2GB，乘以 2 得到
 }STATE_DATA;
 #endif

@@ -55,20 +55,7 @@
         <cursorShape>ArrowCursor</cursorShape>
        </property>
        <property name="text">
-        <string>放大</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="attribute">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>属性</string>
+        <string/>
        </property>
       </widget>
      </item>

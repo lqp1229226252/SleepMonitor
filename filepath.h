@@ -18,7 +18,7 @@ public:
     QString getLightPath();
     QString getAngleAccPath();
     QString getSnorePath();
-    QString getGroAcc();
+    QString getGroAccPath();
     void closeEvent(QCloseEvent *);
 signals:
     void PathChang(int,QString);

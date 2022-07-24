@@ -77,4 +77,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 include($$[QT_INSTALL_PREFIX]/../Src/qttools/src/shared/qtpropertybrowser/qtpropertybrowser.pri)
 
 RESOURCES += \
-    res.qrc
+    res.qrc \
+    resources.qrc

@@ -11,7 +11,10 @@ EEGWnd::EEGWnd(QWidget *parent) :
     init();
     //模拟设置16条曲线名称
     QVector<QString> names={
-        "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"
+        "FP1脑电","FP2脑电","红光","近红光","绿光",
+        "坐立角","翻滚角","运动加速度","左声道鼾声",
+        "右声道鼾声","x-gro","y-gro","z-gro","x-acc",
+        "y-acc","z-acc"
     };
     send_16PlotWidget_position();
     setLineName(names);
@@ -23,13 +26,20 @@ EEGWnd::EEGWnd(QWidget *parent) :
 
 EEGWnd::~EEGWnd()
 {
+    //保存配置文件
+    for(auto i:m_PlotWidgetPtrs)
+    {
+        i->SaveConfig();
+        qDebug()<<"保存配置文件成功";
+    }
+
+
     delete ui;
 }
 //接口
 //依次调用内部PlotWidget实例的AddDatum，将data中的值传给各个PlotWidget实例
 void EEGWnd::AddData(QVector<double> data)
 {
-    qDebug()<<"EEGWnd::AddData"<<data;
     int i=0;
     for(auto PlotWidgetPtr : m_PlotWidgetPtrs)
     {
