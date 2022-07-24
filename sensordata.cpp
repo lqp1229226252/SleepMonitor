@@ -36,6 +36,7 @@ SensorData::SensorData(QObject *object):QObject(object)
     this->m_nLight=1;
     this->m_nSnore=10;
     this->m_nGroAcc=1;
+    m_vSrcData.resize(0);
 }
 void SensorData::appendData(QByteArray pData)
 {
@@ -44,7 +45,7 @@ void SensorData::appendData(QByteArray pData)
     {
         if(findBufEnd())
         {
-            qDebug()<<"开始解析";
+//            qDebug()<<"开始解析";
             QByteArray buffer=getBuffer();
             paraData(buffer);
             int buf_len=buffer[1]+(buffer[2]<<8);
@@ -79,6 +80,86 @@ int SensorData::getSnoreNum()
 int SensorData::getGroAccNum()
 {
     return this->m_nGroAcc;
+}
+
+QVector<SD_FP> SensorData::getFP1()
+{
+    return this->m_vFP1;
+}
+
+QVector<SD_FP> SensorData::getFP2()
+{
+    return this->m_vFP2;
+}
+
+QVector<SD_LIGTH> SensorData::getRedLight()
+{
+    return this->m_vRedLight;
+}
+
+QVector<SD_LIGTH> SensorData::getNearReadLight()
+{
+    return this->m_vNearRedLight;
+}
+
+QVector<SD_LIGTH> SensorData::getGreenLight()
+{
+    return this->m_vGreenLight;
+}
+
+QVector<SD_SNORE> SensorData::getSnoreLeft()
+{
+    return this->m_vLSnore;
+}
+
+QVector<SD_SNORE> SensorData::getSnoreRight()
+{
+    return this->m_vRSnore;
+}
+
+QVector<double> SensorData::getRollAngel()
+{
+    return this->m_vRollAngle;
+}
+
+QVector<double> SensorData::getSeatAngle()
+{
+    return this->m_vSeatAngle;
+}
+
+QVector<double> SensorData::getActionAcc()
+{
+    return this->m_vAcceleration;
+}
+
+QVector<SD_GRO> SensorData::getGrox()
+{
+    return this->m_vXgro;
+}
+
+QVector<SD_GRO> SensorData::getGroy()
+{
+    return this->m_vYgro;
+}
+
+QVector<SD_GRO> SensorData::getGroz()
+{
+    return this->m_vZgro;
+}
+
+QVector<SD_ACC> SensorData::getAccx()
+{
+    return this->m_vXacc;
+}
+
+QVector<SD_ACC> SensorData::getAccy()
+{
+    return this->m_vYacc;
+}
+
+QVector<SD_ACC> SensorData::getAccz()
+{
+    return this->m_vZacc;
 }
 void SensorData::catData(QByteArray pData)
 {
@@ -417,6 +498,7 @@ void SensorData::updateFPAmount()
     if(m_nFPAmount==MAX_LENGTH)
     {
         m_nFPAmount=0;
+        emit(FPOverFlow());
     }
 }
 
@@ -426,6 +508,7 @@ void SensorData::updateLightAmount()
     if(m_nLightAmount==MAX_LENGTH)
     {
         m_nLightAmount=0;
+        emit(lightOverFlow());
     }
 }
 
@@ -435,6 +518,7 @@ void SensorData::updateSnoreAmount()
     if(m_nSnoreAmount==MAX_LENGTH)
     {
         m_nSnoreAmount=0;
+        emit(snoreOverFlow());
     }
 
 }
@@ -445,6 +529,7 @@ void SensorData::updateGROACCAmount()
     if(m_nGroAccAmount==MAX_LENGTH)
     {
         m_nGroAccAmount=0;
+        emit(GroACCOverFlow());
     }
 
 }
@@ -455,6 +540,7 @@ void SensorData::updateAngelAccAmount()
     if(m_nAngleAccAmount==MAX_LENGTH)
     {
         m_nAngleAccAmount=0;
+        emit(AngleAccOverFlow());
     }
 }
 

@@ -6,18 +6,21 @@
 #include "QLineEdit"
 #include <QPalette>
 #include "QMessageBox"
-#include "filepath.h"
+#include "QFileDialog"
 CommSetWidget::CommSetWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CommSetWidget)
 {
     ui->setupUi(this);
     this->serial=new QSerialPort();
-    filepath=new FilePath();
     this->pause_flag=false;
+    ui->file_prefix->setText("data");
+    this->file_prefix=QCoreApplication::applicationDirPath()+"/data";
+//    qDebug()<<file_prefix;
     setFont();
     setUI();
     on_serial_detect_clicked();
+
     connect(serial,SIGNAL(readyRead()),this,SLOT(readData()));
     connect(serial,SIGNAL(errorOccurred(QSerialPort::SerialPortError)),this,SLOT(dealError(QSerialPort::SerialPortError)));
     //sensordata的信号
@@ -26,16 +29,12 @@ CommSetWidget::CommSetWidget(QWidget *parent) :
     connect(&sensordata,SIGNAL(dataSignal(QVector<double>)),this,SLOT(dataSlot(QVector<double>)));
     connect(&sensordata,SIGNAL(stataSignal(STATE_DATA)),this,SLOT(stataSlot(STATE_DATA)));
     connect(&sensordata,SIGNAL(lossRateChange(float)),this,SLOT(lossRateChangeSlot(float)));
-    //文件路径设置窗口信号
-    connect(filepath,SIGNAL(close()),this,SLOT(updatafilePath()));
-    connect(filepath,SIGNAL(PathChang(int,QString)),this,SLOT(updatefilePath(int,QString)));
 }
 
 CommSetWidget::~CommSetWidget()
 {
     delete ui;
     delete serial;
-    delete filepath;
 }
 void CommSetWidget::setFont()
 {
@@ -104,16 +103,9 @@ void CommSetWidget::setCtrlData(int nFP, int nSnore, int nLight, int nGroAcc)
 {
     this->sensordata.setCtrlData(nFP,nSnore,nLight,nGroAcc);
 }
-
-QStringList CommSetWidget::getAllPath()
+SensorData *CommSetWidget::getSensorData()
 {
-    QStringList list;
-    list.append(filepath->getFPPath());
-    list.append(filepath->getLightPath());
-    list.append(filepath->getAngleAccPath());
-    list.append(filepath->getSnorePath());
-    list.append(filepath->getGroAccPath());
-    return list;
+    return &sensordata;
 }
 void CommSetWidget::on_start_clicked()
 {
@@ -140,7 +132,7 @@ void CommSetWidget::on_start_clicked()
 
 void CommSetWidget::on_pause_clicked()
 {
-    write("123456");
+//    write("123456");
     if(serial->isOpen())
     {
        pause_flag=true;
@@ -228,35 +220,29 @@ void CommSetWidget::lossRateChangeSlot(float loss)
 //    qDebug()<<loss;
     emit(lossRateChange(loss));
 }
-
-void CommSetWidget::on_file_set_clicked()
-{
-    filepath->show();
-}
-
 void CommSetWidget::on_file_start_clicked()
 {
-    emit(fileStorageState(true));
+    emit(fileStart(this->file_prefix));
 }
 
 void CommSetWidget::on_file_end_clicked()
 {
-    emit(fileStorageState(true));
+    emit(fileEnd());
 }
 
-void CommSetWidget::updatafilePath()
-{
-    QStringList list;
-    list.append(filepath->getFPPath());
-    list.append(filepath->getLightPath());
-    list.append(filepath->getAngleAccPath());
-    list.append(filepath->getSnorePath());
-    list.append(filepath->getGroAccPath());
-//    qDebug()<<list;
-    emit(FilePathChange(list));
-}
 
-void CommSetWidget::updatefilePath(int type, QString Path)
+
+void CommSetWidget::on_file_browse_clicked()
 {
-    emit(FilePathChange(type,Path));
+    if(ui->file_prefix->text()=="")
+    {
+        messageBox("请输入文件前缀");
+    }
+    else {
+        QString file_dir=QFileDialog::getExistingDirectory(this,"选择保存路径")+"/";
+//        qDebug()<<file_dir;
+        QString file_prefix=file_dir+ui->file_prefix->text();
+        this->file_prefix=file_prefix;
+    }
+
 }

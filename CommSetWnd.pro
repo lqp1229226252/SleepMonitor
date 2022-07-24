@@ -26,19 +26,16 @@ CONFIG += c++11
 
 SOURCES += \
         commsetwidget.cpp \
-        filepath.cpp \
         main.cpp \
         sensordata.cpp
 
 HEADERS += \
     commsetwidget.h \
-    filepath.h \
     sensordata.h \
     struct_data.h
 
 FORMS += \
-    commsetwidget.ui \
-    filepath.ui
+    commsetwidget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
