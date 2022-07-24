@@ -15,12 +15,39 @@ public:
     int getLightNum();
     int getSnoreNum();
     int getGroAccNum();
+
+    QVector<SD_FP> getFP1();
+    QVector<SD_FP> getFP2();
+
+    QVector<SD_LIGTH> getRedLight();
+    QVector<SD_LIGTH> getNearReadLight();
+    QVector<SD_LIGTH> getGreenLight();
+
+    QVector<SD_SNORE> getSnoreLeft();
+    QVector<SD_SNORE> getSnoreRight();
+
+    QVector<double>   getRollAngel();
+    QVector<double>   getSeatAngle();
+    QVector<double>   getActionAcc();
+
+    QVector<SD_GRO>   getGrox();
+    QVector<SD_GRO>   getGroy();
+    QVector<SD_GRO>   getGroz();
+
+    QVector<SD_ACC>   getAccx();
+    QVector<SD_ACC>   getAccy();
+    QVector<SD_ACC>   getAccz();
 signals:
     void dataSignal(QByteArray);
     void dataSignal(QVector<double>);
     void stataSignal(QByteArray);
     void stataSignal(STATE_DATA);
     void lossRateChange(float);
+    void FPOverFlow();
+    void lightOverFlow();
+    void snoreOverFlow();
+    void AngleAccOverFlow();
+    void GroACCOverFlow();
 public slots:
 private:
     /* data */
