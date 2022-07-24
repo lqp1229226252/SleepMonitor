@@ -1,15 +1,10 @@
-﻿#include "ContralDataWidget.h"
+#include "ContralDataWidget.h"
 #include "QObject"
 #include "QByteArray"
 #include "QRegExp"
 #include "QRegExpValidator"
 #include "QDebug"
-#if _MSC_VER >= 1600
-
-#pragma execution_character_set("utf-8")
-
-#endif
-
+#include "QCoreApplication"
 ComboBox::ComboBox(QWidget *parent):QWidget (parent)
 {
 
@@ -159,6 +154,7 @@ ContralDataWidget::ContralDataWidget(QWidget *parent)
     this->hbox=new QHBoxLayout(this);
     this->hbox->addLayout(vbox1);
     this->hbox->addLayout(send_vbox);
+
     setUI();
     setConnect();
     initBuf();
@@ -421,9 +417,14 @@ SD_AMOUNT ContralDataWidget::getSensorDataAmount()
     return ctrldata.getSensorDataAmount();
 }
 
-CTRL_DATA ContralDataWidget::getCtrlData()
+//CTRL_DATA ContralDataWidget::getCtrlData()
+//{
+//    return ctrldata.getCtrlData();
+//}
+
+ControlData* ContralDataWidget::getCtrlData()
 {
-    return ctrldata.getCtrlData();
+    return &ctrldata;
 }
 
 

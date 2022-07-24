@@ -1,4 +1,4 @@
-﻿#ifndef Widget_H
+#ifndef Widget_H
 #define Widget_H
 #include <QWidget>
 #include "QComboBox"
@@ -8,15 +8,7 @@
 #include "QButtonGroup"
 #include "QLineEdit"
 #include "QPushButton"
-
-#if _MSC_VER >= 1600
-
-#pragma execution_character_set("utf-8")
-
-#endif
-
 #include "controldata.h"
-
 class ComboBox: public QWidget
 {
     Q_OBJECT
@@ -78,7 +70,8 @@ public:
     void setSize(int w,int h);
     void setSDAmount();
     SD_AMOUNT getSensorDataAmount();
-    CTRL_DATA getCtrlData();
+//    CTRL_DATA getCtrlData();
+    ControlData *getCtrlData();
 signals:
     void sendSingal(QByteArray);
 public slots:
@@ -128,7 +121,6 @@ private:
     uint8_t   buf_end;
 
     ControlData ctrldata;
-
 };
 
 #endif // Widget_H
