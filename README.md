@@ -30,3 +30,29 @@ QStringlist getAllPath()//获取文件的全部路径
 ```
 fileStorageState(bool) //true表示发送开始转存，false表示结束转存储
 ```
+# 文件转存示例
+## 信号连接
+```
+    connect(comm_widget,SIGNAL(fileStart(QString)),ctrl_data->getCtrlData(),SLOT(SaveBegin(QString)));//文件转存信号与ctrldata的savebegin连接
+    connect(comm_widget,SIGNAL(fileEnd()),ctrl_data->getCtrlData(),SLOT(SaveEnd()));//文件转存结束信号
+    connect(comm_widget->getSensorData(),SIGNAL(FPOverFlow()),this,SLOT(FPOverFlowSlot()));//接收数据溢出信号后开始存储数据到文件
+```
+## 存储
+例如FP数据
+```
+ ControlData *ctrl=ctrl_data->getCtrlData(); //获取ctrl的地址
+    if(ctrl->getSaveFlag())//查看转存状态
+    {
+        //获取数据
+        SensorData *data=comm_widget->getSensorData();
+        QVector<SD_FP> FP1=data->getFP1();
+        QVector<SD_FP> FP2=data->getFP2();
+        //将数据存储在csv
+        ctrl->saveFP1(FP1);
+        ctrl->saveFP2(FP2);
+        qDebug()<<"转存完毕";
+    }
+    else {
+        qDebug()<<"转存没开始";
+    }
+```
