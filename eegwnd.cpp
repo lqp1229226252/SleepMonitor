@@ -30,7 +30,7 @@ EEGWnd::~EEGWnd()
     for(auto i:m_PlotWidgetPtrs)
     {
         i->SaveConfig();
-        qDebug()<<"保存配置文件成功";
+//        qDebug()<<"保存配置文件成功";
     }
 
 
@@ -171,5 +171,5 @@ void EEGWnd::init(void)
     }
 
     send_EEGWnd_size();
-
+    get_plotwidget_position();
 }

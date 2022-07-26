@@ -4,6 +4,17 @@
 #include <QObject>
 #include "struct_data.h"
 #include "QVector"
+typedef union data32
+{
+    qint32 data;
+    char buffer[4];
+
+}Data32;
+typedef union data16
+{
+    qint16 data;
+    char buffer[4];
+}Data16;
 class SensorData : public QObject
 {
     Q_OBJECT

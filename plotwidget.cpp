@@ -182,7 +182,7 @@ void PlotWidget::setLineName(QString name)
     updata_property_struct();
 
     //创建存放属性文件夹 在这调用是因为要用id来命令文件夹
-    qDebug()<<"linesName :"<<m_Property.linesName;
+//    qDebug()<<"linesName :"<<m_Property.linesName;
     //设置完名字后把属性结构体保存在配置文件中
     //如果config文件不存在则先saveconfig把结构体默认值（也就是dynamicplot类中初始化曲线的参数）
     //先保存在结构体中并且存到配置文件中再readconfig，否则就不执行saveconfig这样就解决了

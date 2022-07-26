@@ -246,63 +246,59 @@ void SensorData::paraAllData(QByteArray buffer)
     int index=0;
     QByteArray data;
     QVector<double> vector(m_nFP*2+m_nLight*3+m_nSnore*2+3+m_nGroAcc*6);
-    //插入FP1数据
     int data_index=0;
     for(int i=0;i<m_nFP;i++)
     {
-         data=getdata(buffer,index,index+4);
+         //插入FP1数据
+         int FP1_index=index;
+         data=getdata(buffer,FP1_index,index+4);
          SD_FP fp1=paraFPData(data);
          vector[data_index]=fp1.dbVal;
          insertData(this->m_vFP1,fp1);
-         index+=4;
-         data_index++;
 
-    }
-    //插入FP2数据
-    for(int i=0;i<m_nFP;i++)
-    {
-         data=getdata(buffer,index,index+4);
+         //插入FP2
+         int FP2_index=index+m_nFP*4;
+         data=getdata(buffer,FP2_index,FP2_index+4);
          SD_FP fp2=paraFPData(data);
-         vector[data_index]=fp2.dbVal;
+         vector[data_index+m_nFP]=fp2.dbVal;
          insertData(this->m_vFP2,fp2);
          index+=4;
          data_index++;
          updateFPAmount();
-
     }
-    //解析红光数据
+    index+=m_nFP*4;
+    data_index+=m_nFP;
+
     for(int i=0;i<m_nLight;i++)
     {
-         data=getdata(buffer,index,index+3);
+        //解析红光数据
+         int red_index=index;
+         data=getdata(buffer,red_index,red_index+3);
          SD_LIGTH light_red=paraLightData(data);
          vector[data_index]=light_red.dbVal;
          insertData(this->m_vRedLight,light_red);
-         index+=3;
-         data_index++;
 
-    }
-    //解析近红光数据
-    for(int i=0;i<m_nLight;i++)
-    {
-         data=getdata(buffer,index,index+3);
+         //解析近红光数据
+         int near_index=index+m_nLight*3;
+         data=getdata(buffer,near_index,near_index+3);
          SD_LIGTH light_near_red=paraLightData(data);
          vector[data_index]=light_near_red.dbVal;
          insertData(this->m_vNearRedLight,light_near_red);
-         index+=3;
-         data_index++;
-    }
-    //解析绿光数据
-    for(int i=0;i<m_nLight;i++)
-    {
-         data=getdata(buffer,index,index+3);
+
+         //解析绿光数据
+         int green_index=index+m_nLight*3*2;
+         data=getdata(buffer,green_index,green_index+3);
          SD_LIGTH light_green=paraLightData(data);
          vector[data_index]=light_green.dbVal;
          insertData(this->m_vGreenLight,light_green);
+
          index+=3;
          data_index++;
          updateLightAmount();
-    }
 
+    }
+    data_index+=m_nLight*2;
+    index+=m_nLight*3*2;
     //解析坐立角数据
     data=getdata(buffer,index,index+2);
     double seat_angle=paraAngleData(data);
@@ -392,56 +388,79 @@ void SensorData::paraAllData(QByteArray buffer)
 SD_FP SensorData::paraFPData(QByteArray buffer)
 {
     SD_FP fp;
-    int value=buffer[0]+(buffer[1]<<8)+(buffer[2]<<16);
+    Data32 data;
+    data.buffer[1]=buffer[1];
+    data.buffer[2]=buffer[2];
+    data.buffer[3]=buffer[3];
+    int value=data.data>>8;
     fp.dbVal=value*0.1;
-    fp.nIndex=buffer[4]&0x0E;
-    fp.nRemark=buffer[4]&0x01;
+    fp.nIndex=buffer[0]&0x0E>>1;
+    fp.nRemark=buffer[0]&0x01;
     return fp;
 }
 SD_LIGTH SensorData::paraLightData(QByteArray buffer)
 {
     SD_LIGTH light;
-    int value=buffer[0]+(buffer[1]<<8)+((buffer[2]&0xC0)<<10);
+    Data32 data;
+    data.buffer[1]=buffer[0]&char(0xC0);
+    data.buffer[2]=buffer[1];
+    data.buffer[3]=buffer[2];
+    int value=data.data>>14;
     light.dbVal=value*10;
-    light.nIndex=buffer[3]&0x03;
+    light.nIndex=buffer[0]&0x03;
     return light;
 }
 double SensorData::paraAngleData(QByteArray buffer)
 {
     double angel;
-    int value=buffer[0]+((buffer[1]&0xF0)<<4);
+    Data16 data;
+    data.buffer[0]=buffer[0]&char(0xF0);
+    data.buffer[1]=buffer[1];
+    int value=data.data>>4;
     angel=value*0.1;
     return angel;
 }
 double SensorData::paraActionAccData(QByteArray buffer)
 {
     double action_acc;
-    int value=buffer[0]+((buffer[1]&0xF0)<<4);
+    Data16 data;
+    data.buffer[0]=buffer[0]&char(0xF0);
+    data.buffer[1]=buffer[1];
+    int value=data.data>>4;
     action_acc=value*0.1;
     return action_acc;
 }
 SD_SNORE SensorData::paraSnoreData(QByteArray buffer)
 {
     SD_SNORE snore;
-    int value=buffer[0]+(buffer[1]<<8);
+    Data16 data;
+    data.buffer[0]=buffer[1];
+    data.buffer[1]=buffer[2];
+    int value=data.data;
     snore.dbVal=value*0.1;
-    snore.nIndex=buffer[3]&0x0F;
+    snore.nIndex=buffer[0]&0x0F;
     return snore;
 }
 SD_ACC SensorData::paraAccData(QByteArray buffer)
 {
     SD_ACC acc;
-    int value=buffer[0]+(buffer[1]<<8);
+    Data16 data;
+    data.buffer[0]=buffer[1];
+    data.buffer[1]=buffer[2];
+    int value=data.data;
     acc.dbVal=value*0.1;
-    acc.nIndex=buffer[3]&0x0F;
+    acc.nIndex=buffer[0]&0x0F;
     return acc;
 }
 SD_GRO SensorData::paraGroData(QByteArray buffer)
 {
     SD_GRO gro;
-    int value=buffer[0]+(buffer[1]<<8);
+    Data16 data;
+    data.buffer[0]=buffer[2];
+    data.buffer[1]=buffer[1];
+    int value=data.data;
     gro.dbVal=value*0.1;
-    gro.nIndex=buffer[3]&0x0F;
+    gro.nIndex=buffer[0]&0x0F;
     return gro;
 }
 STATE_DATA SensorData::paraStateData(QByteArray buffer)
