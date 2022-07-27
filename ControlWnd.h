@@ -29,7 +29,11 @@ public:
     ~ControlWnd();
 public slots:
     void get_eegwnd(EEGWnd *,OutPutWnd *);
-
+    void FPOverFlowSlot();
+    void lightOverFlowSlot();
+    void angleaccOverFlowSlot();
+    void snoreOverFlowSlot();
+    void groaccOverFlowSlot();
 
 
 signals:
