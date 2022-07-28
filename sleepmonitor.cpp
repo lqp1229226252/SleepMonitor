@@ -7,7 +7,7 @@ SleepMonitor::SleepMonitor(QWidget *parent)
 {
     ui->setupUi(this);
     ui->widget_eegwnd->setFixedWidth(1100);
-    this->setFixedSize(1920,1080);
+    this->setFixedSize(1920,1000);
     ui->widget_controlWnd->setFixedWidth(800);
     ui->widget_result->setFixedWidth(800);
     ui->widget_outPutWnd->setFixedWidth(800);

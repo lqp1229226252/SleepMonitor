@@ -24,6 +24,11 @@ ControlWnd::ControlWnd(QWidget *parent)
     connect(commsetwidget,SIGNAL(fileStart(QString)),contralDataWidget->getCtrlData(),SLOT(SaveBegin(QString)));//文件转存信号与ctrldata的savebegin连接
     connect(commsetwidget,SIGNAL(fileEnd()),contralDataWidget->getCtrlData(),SLOT(SaveEnd()));//文件转存结束信号
 
+    connect(commsetwidget->getSensorData(),SIGNAL(FPOverFlow()),this,SLOT(FPOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(lightOverFlow()),this,SLOT(lightOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(snoreOverFlow()),this,SLOT(snoreOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(AngleAccOverFlow()),this,SLOT(angleaccOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(GroACCOverFlow()),this,SLOT(groaccOverFlowSlot()));
 
 }
 

@@ -363,6 +363,8 @@ void DynamicPlot::setXYvisbile(bool f)
     this->myCustomPlot->xAxis->setLabel("time");
     this->myCustomPlot->yAxis->setLabel("values");
 
+//    this->myCustomPlot->replot();
+
 }
 //-----------------------------------------------------
 

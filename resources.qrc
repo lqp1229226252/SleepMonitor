@@ -2,4 +2,7 @@
     <qresource prefix="/image">
         <file>icon/1.ico</file>
     </qresource>
+    <qresource prefix="/">
+        <file>icon/icon.jpg</file>
+    </qresource>
 </RCC>

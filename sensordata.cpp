@@ -48,7 +48,7 @@ void SensorData::appendData(QByteArray pData)
 //            qDebug()<<"开始解析";
             QByteArray buffer=getBuffer();
             paraData(buffer);
-            int buf_len=buffer[1]+(buffer[2]<<8);
+            quint8 buf_len=quint8(buffer[1]+(buffer[2]<<8));
             calPacketLossRate(buffer[buf_len-2]);
         }
     }
@@ -187,7 +187,7 @@ bool SensorData::findBufHead()
 }
 bool SensorData::findBufEnd()
 {
-    int buf_len=this->m_vSrcData[1]+(this->m_vSrcData[2]<<8);
+    quint8 buf_len=quint8(this->m_vSrcData[1]+(this->m_vSrcData[2]<<8));
     if(this->m_vSrcData.size()<buf_len)
     {
         return false;
@@ -204,7 +204,7 @@ bool SensorData::findBufEnd()
 
 QByteArray SensorData::getBuffer()
 {
-    int buf_len=this->m_vSrcData.at(1)+(this->m_vSrcData.at(2)<<8);
+    quint8 buf_len=quint8(this->m_vSrcData.at(1)+(this->m_vSrcData.at(2)<<8));
     QByteArray buffer;
     for(int i=0;i<buf_len;i++)
     {
@@ -341,7 +341,7 @@ void SensorData::paraAllData(QByteArray buffer)
         updateSnoreAmount();
     }
     data_index+=m_nSnore;
-    index+=m_nSnore*3;
+    index+=m_nSnore;
     for(int i=0;i<m_nGroAcc;i++)
     {
         //解析x-gro数据
@@ -565,7 +565,7 @@ void SensorData::updateAngelAccAmount()
 
 QByteArray SensorData::getSendData(char *buffer)
 {
-     int buf_len=buffer[1]+(buffer[2]<<8);
+     quint8 buf_len=quint8(buffer[1]+(buffer[2]<<8));
      QByteArray data;
      for(int i=4;i<(buf_len-3);i++)
      {

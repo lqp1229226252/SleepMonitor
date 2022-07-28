@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
 //    w.setWindowFlag(Qt::Window);
 //    w.showFullScreen();
 //    w.setWindowState(Qt::WindowMaximized);
+    w.setWindowIcon(QIcon(":/icon/icon.jpg"));
     w.show();
 
     return a.exec();

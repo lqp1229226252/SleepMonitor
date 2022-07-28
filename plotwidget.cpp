@@ -325,7 +325,7 @@ void PlotWidget::Max_Widget(void)
     //this->ui->maxmum->setText("恢复");
 
     this->setGeometry(0,0,EEGWnd_size.width(), EEGWnd_size.height());
-//    this->setFixedHeight(EEGWnd_size.height());
+    this->setFixedHeight(EEGWnd_size.height());
     this->activateWindow();
 
     //放大之后要显示坐标轴
@@ -358,7 +358,7 @@ void PlotWidget::Recovery_Widget(void)
 
     //用自己在EEGWnd中的位置来恢复放大之前的位置
     this->setGeometry(position_in_EEGWnd.x(),position_in_EEGWnd.y(),position_in_EEGWnd.width(),position_in_EEGWnd.height());
-//    this->setFixedHeight(position_in_EEGWnd.height());
+    this->setFixedHeight(PlotWidget_size.height());
     this->activateWindow();
     //恢复之后要隐藏坐标轴
     ui->dynamicplot->setXYvisbile(false);

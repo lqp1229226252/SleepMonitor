@@ -117,7 +117,7 @@ void ControlData::SaveBegin(QString prefix)
     checkFileExit(m_strPathAccX);
     m_strPathAccY=prefix+"_accy.csv";
     checkFileExit(m_strPathAccY);
-    m_strPathAccZ=prefix+"_accz,csv";
+    m_strPathAccZ=prefix+"_accz.csv";
     checkFileExit(m_strPathAccZ);
 
     this->storage_falg=true;
