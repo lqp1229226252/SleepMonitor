@@ -29,7 +29,7 @@ ControlWnd::ControlWnd(QWidget *parent)
 }
 
 void ControlWnd::dataPlot(QVector<double> data){
-    qDebug()<<"ControlWnd::dataPlot"<<data;
+//    qDebug()<<"ControlWnd::dataPlot"<<data;
     int fp_num=contralDataWidget->getCtrlData()->getFPAmount();
     int snore_num=contralDataWidget->getCtrlData()->getSnoreAmount();
     int light_num=contralDataWidget->getCtrlData()->getLightAmount();
@@ -89,7 +89,6 @@ void ControlWnd::dataPlot(QVector<double> data){
         chart_data.append(data[groacc_index+acc_num*3]);
         chart_data.append(data[groacc_index+acc_num*4]);
         chart_data.append(data[groacc_index+acc_num*5]);
-
         eegwnd->AddData(chart_data);
     }
 }

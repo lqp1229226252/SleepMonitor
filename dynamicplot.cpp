@@ -97,7 +97,7 @@ DynamicPlot::DynamicPlot(QWidget *parent, const QString fileName) :
 
 
 
-    startTimer(1);
+//    startTimer(1);
 
 
 }
@@ -204,7 +204,7 @@ void DynamicPlot::AddDatum(double val)
 {
 
     //
-
+    sampleNumber+=1;
     ui->plotWidget->graph(0)->addData(sampleNumber,val);
 
     //设置x轴不断更新函数原型
