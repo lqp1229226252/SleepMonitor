@@ -40,6 +40,7 @@ EEGWnd::~EEGWnd()
 //依次调用内部PlotWidget实例的AddDatum，将data中的值传给各个PlotWidget实例
 void EEGWnd::AddData(QVector<double> data)
 {
+//    qDebug()<<"insertData:"<<data;
     int i=0;
     for(auto PlotWidgetPtr : m_PlotWidgetPtrs)
     {

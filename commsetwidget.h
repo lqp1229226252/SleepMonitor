@@ -20,7 +20,7 @@ public:
     void setSize(int w,int h);
     void write(QByteArray);
     void messageBox(QString str);
-    void setCtrlData(int,int,int,int);
+//    void setCtrlData(int,int,int,int);
     SensorData *getSensorData();
 signals:
     void dataSignal(QByteArray);

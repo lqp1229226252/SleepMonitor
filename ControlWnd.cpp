@@ -24,16 +24,12 @@ ControlWnd::ControlWnd(QWidget *parent)
     connect(commsetwidget,SIGNAL(fileStart(QString)),contralDataWidget->getCtrlData(),SLOT(SaveBegin(QString)));//文件转存信号与ctrldata的savebegin连接
     connect(commsetwidget,SIGNAL(fileEnd()),contralDataWidget->getCtrlData(),SLOT(SaveEnd()));//文件转存结束信号
 
-    connect(commsetwidget->getSensorData(),SIGNAL(FPOverFlow()),this,SLOT(FPOverFlowSlot()));
-    connect(commsetwidget->getSensorData(),SIGNAL(lightOverFlow()),this,SLOT(lightOverFlowSlot()));
-    connect(commsetwidget->getSensorData(),SIGNAL(snoreOverFlow()),this,SLOT(snoreOverFlowSlot()));
-    connect(commsetwidget->getSensorData(),SIGNAL(AngleAccOverFlow()),this,SLOT(angleaccOverFlowSlot()));
-    connect(commsetwidget->getSensorData(),SIGNAL(GroACCOverFlow()),this,SLOT(groaccOverFlowSlot()));
-
+    //设置文件信号的连接
+    setSaveConnect();
 }
 
 void ControlWnd::dataPlot(QVector<double> data){
-//    qDebug()<<"ControlWnd::dataPlot"<<data;
+    qDebug()<<"ControlWnd::dataPlot"<<data;
     int fp_num=contralDataWidget->getCtrlData()->getFPAmount();
     int snore_num=contralDataWidget->getCtrlData()->getSnoreAmount();
     int light_num=contralDataWidget->getCtrlData()->getLightAmount();
@@ -96,10 +92,13 @@ void ControlWnd::dataPlot(QVector<double> data){
 
         eegwnd->AddData(chart_data);
     }
-
 }
 
 void ControlWnd::send_command(QByteArray data) {
+
+    ControlData *ctrl_data=contralDataWidget->getCtrlData();
+    SensorData *sensordata=commsetwidget->getSensorData();
+    sensordata->setCtrlData(ctrl_data->getFPAmount(),ctrl_data->getLightAmount(),ctrl_data->getSnoreAmount(),ctrl_data->getGroAccAmount(),ctrl_data->getCtrlData().nSrc);
     commsetwidget->write(data);
 }
 
@@ -108,7 +107,7 @@ void ControlWnd::get_eegwnd(EEGWnd *eegwnd,OutPutWnd *outputwnd){
     //    commsetwidget->get_eegwnd(eegwnd,outputwnd);
 }
 
-void ControlWnd::FPOverFlowSlot()
+void ControlWnd::FP1OverFlowSlot()
 {
     ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
     if(ctrl->getSaveFlag())//查看转存状态
@@ -116,18 +115,26 @@ void ControlWnd::FPOverFlowSlot()
        //获取数据
        SensorData *data=commsetwidget->getSensorData();
        QVector<SD_FP> FP1=data->getFP1();
-       QVector<SD_FP> FP2=data->getFP2();
        //将数据存储在csv
        ctrl->saveFP1(FP1);
-       ctrl->saveFP2(FP2);
-    //           qDebug()<<"转存完毕";
-    }
-    else {
-    //           qDebug()<<"转存没开始";
     }
 }
 
-void ControlWnd::lightOverFlowSlot()
+void ControlWnd::FP2OverFlowSlot()
+{
+    ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
+    if(ctrl->getSaveFlag())//查看转存状态
+    {
+       //获取数据
+       SensorData *data=commsetwidget->getSensorData();
+       QVector<SD_FP> FP2=data->getFP2();
+       //将数据存储在csv
+       ctrl->saveFP2(FP2);
+    //           qDebug()<<"转存完毕";
+    }
+}
+
+void ControlWnd::redLightOverFlowSlot()
 {
     ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
     if(ctrl->getSaveFlag())//查看转存状态
@@ -135,20 +142,37 @@ void ControlWnd::lightOverFlowSlot()
        //获取数据
        SensorData *data=commsetwidget->getSensorData();
        QVector<SD_LIGTH> red_light=data->getRedLight();
-       QVector<SD_LIGTH> near_red_light=data->getNearReadLight();
-       QVector<SD_LIGTH> green_light=data->getGreenLight();
        //将数据存储在csv
        ctrl->saveRedLight(red_light);
-       ctrl->saveRedNearLight(near_red_light);
-       ctrl->saveGreenLight(green_light);
-    //           qDebug()<<"转存完毕";
-    }
-    else {
-    //           qDebug()<<"转存没开始";
     }
 }
 
-void ControlWnd::angleaccOverFlowSlot()
+void ControlWnd::nearRedLightOverFlowSlot()
+{
+    ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
+    if(ctrl->getSaveFlag())//查看转存状态
+    {
+       //获取数据
+       SensorData *data=commsetwidget->getSensorData();
+       QVector<SD_LIGTH> near_red_light=data->getNearReadLight();
+       //将数据存储在csv
+       ctrl->saveRedNearLight(near_red_light);
+    }
+
+}
+void ControlWnd::greenLightOverFlowSlot()
+{
+    ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
+    if(ctrl->getSaveFlag())//查看转存状态
+    {
+       //获取数据
+       SensorData *data=commsetwidget->getSensorData();
+       QVector<SD_LIGTH> green_light=data->getGreenLight();
+       //将数据存储在csv
+       ctrl->saveGreenLight(green_light);;
+    }
+}
+void ControlWnd::seatAngleOverFlowSlot()
 {
 
     ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
@@ -156,21 +180,36 @@ void ControlWnd::angleaccOverFlowSlot()
     {
        //获取数据
        SensorData *data=commsetwidget->getSensorData();
-       QVector<double> roll_angle=data->getRollAngel();
        QVector<double> seat_angle=data->getSeatAngle();
-       QVector<double> acc=data->getActionAcc();
        //将数据存储在csv
-       ctrl->saveRollAngel(roll_angle);
        ctrl->saveSeatAngle(seat_angle);
-       ctrl->saveAcc(acc);
-    //           qDebug()<<"转存完毕";
-    }
-    else {
-    //           qDebug()<<"转存没开始";
     }
 }
-
-void ControlWnd::snoreOverFlowSlot()
+void ControlWnd::rollAngleOverFlowSlot()
+{
+    ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
+    if(ctrl->getSaveFlag())//查看转存状态
+    {
+       //获取数据
+       SensorData *data=commsetwidget->getSensorData();
+       QVector<double> roll_angle=data->getRollAngel();
+       //将数据存储在csv
+       ctrl->saveRollAngel(roll_angle);
+    }
+}
+void ControlWnd::AccOverFlowSlot()
+{
+    ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
+    if(ctrl->getSaveFlag())//查看转存状态
+    {
+       //获取数据
+       SensorData *data=commsetwidget->getSensorData();
+       QVector<double> acc=data->getActionAcc();
+       //将数据存储在csv
+       ctrl->saveAcc(acc);
+    }
+}
+void ControlWnd::LSnoreOverFlowSlot()
 {
 
     ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
@@ -179,18 +218,11 @@ void ControlWnd::snoreOverFlowSlot()
        //获取数据
        SensorData *data=commsetwidget->getSensorData();
        QVector<SD_SNORE> l_snore=data->getSnoreLeft();
-       QVector<SD_SNORE> r_snore=data->getSnoreRight();
        //将数据存储在csv
        ctrl->saveLSnore(l_snore);
-       ctrl->saveRSnore(r_snore);
-    //           qDebug()<<"转存完毕";
-    }
-    else {
-    //           qDebug()<<"转存没开始";
     }
 }
-
-void ControlWnd::groaccOverFlowSlot()
+void ControlWnd::RSnoreOverFlowSlot()
 {
 
     ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
@@ -198,31 +230,111 @@ void ControlWnd::groaccOverFlowSlot()
     {
        //获取数据
        SensorData *data=commsetwidget->getSensorData();
-       QVector<SD_GRO> grox=data->getGrox();
-       QVector<SD_GRO> groy=data->getGroy();
-       QVector<SD_GRO> groz=data->getGroz();
-       QVector<SD_ACC> accx=data->getAccx();
-       QVector<SD_ACC> accy=data->getAccy();
-       QVector<SD_ACC> accz=data->getAccz();
+       QVector<SD_SNORE> r_snore=data->getSnoreRight();
        //将数据存储在csv
-       ctrl->saveGrox(grox);
-       ctrl->saveGroy(groy);
-       ctrl->saveGroz(groz);
-       ctrl->saveACCx(accx);
-       ctrl->saveACCy(accy);
-       ctrl->saveAccz(accz);
-    //           qDebug()<<"转存完毕";
-    }
-    else {
-    //           qDebug()<<"转存没开始";
+       ctrl->saveRSnore(r_snore);
     }
 }
-
-
+void ControlWnd::groXOverFlowSlot()
+{
+    ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
+    if(ctrl->getSaveFlag())//查看转存状态
+    {
+       //获取数据
+       SensorData *data=commsetwidget->getSensorData();
+       QVector<SD_GRO> grox=data->getGrox();
+       //将数据存储在csv
+       ctrl->saveGrox(grox);
+    }
+}
+void ControlWnd::groYOverFlowSlot()
+{
+    ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
+    if(ctrl->getSaveFlag())//查看转存状态
+    {
+       //获取数据
+       SensorData *data=commsetwidget->getSensorData();
+       QVector<SD_GRO> groy=data->getGroy();
+       //将数据存储在csv
+       ctrl->saveGroy(groy);
+    }
+}
+void ControlWnd::groZOverFlowSlot()
+{
+    ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
+    if(ctrl->getSaveFlag())//查看转存状态
+    {
+       //获取数据
+       SensorData *data=commsetwidget->getSensorData();
+       QVector<SD_GRO> groz=data->getGroz();
+       //将数据存储在csv
+       ctrl->saveGroz(groz);
+    }
+}
+void ControlWnd::accXOverFlowSlot()
+{
+    ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
+    if(ctrl->getSaveFlag())//查看转存状态
+    {
+       //获取数据
+       SensorData *data=commsetwidget->getSensorData();
+       QVector<SD_ACC> accx=data->getAccx();
+       //将数据存储在csv
+       ctrl->saveACCx(accx);
+    }
+}
+void ControlWnd::accYOverFlowSlot()
+{
+    ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
+    if(ctrl->getSaveFlag())//查看转存状态
+    {
+       //获取数据
+       SensorData *data=commsetwidget->getSensorData();
+       QVector<SD_ACC> accy=data->getAccy();
+       //将数据存储在csv
+       ctrl->saveACCy(accy);
+    }
+}
+void ControlWnd::accZOverFlowSlot()
+{
+    ControlData *ctrl=contralDataWidget->getCtrlData(); //获取ctrl的地址
+    if(ctrl->getSaveFlag())//查看转存状态
+    {
+       //获取数据
+       SensorData *data=commsetwidget->getSensorData();
+       QVector<SD_ACC> accz=data->getAccz();
+       //将数据存储在csv
+       ctrl->saveAccz(accz);
+    }
+}
 ControlWnd::~ControlWnd()
 {
     delete sleepinterventionwidget;
     delete contralDataWidget;
     delete ui;
+}
+
+void ControlWnd::setSaveConnect()
+{
+    connect(commsetwidget->getSensorData(),SIGNAL(FP1OverFlow()),this,SLOT(FP1OverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(FP2OverFlow()),this,SLOT(FP2OverFlowSlot()));
+
+    connect(commsetwidget->getSensorData(),SIGNAL(redLightOverFlow()),this,SLOT(redLightOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(nearRedLightOverFlow()),this,SLOT(nearRedLightOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(greenLightOverFlow()),this,SLOT(greenLightOverFlowSlot()));
+
+    connect(commsetwidget->getSensorData(),SIGNAL(seatAngleOverFlow()),this,SLOT(seatAngleOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(rollAngleOverFlow()),this,SLOT(rollAngleOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(accOverFlow()),this,SLOT(AccOverFlowSlot()));
+
+    connect(commsetwidget->getSensorData(),SIGNAL(lSnoreOverFlow()),this,SLOT(LSnoreOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(rSnoreOverFlow()),this,SLOT(RSnoreOverFlowSlot()));
+
+    connect(commsetwidget->getSensorData(),SIGNAL(GroXOverFlow()),this,SLOT(groXOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(GroYOverFlow()),this,SLOT(groYOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(GroZOverFlow()),this,SLOT(groZOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(ACCXOverFlow()),this,SLOT(accXOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(ACCYOverFlow()),this,SLOT(accYOverFlowSlot()));
+    connect(commsetwidget->getSensorData(),SIGNAL(ACCZOverFlow()),this,SLOT(accZOverFlowSlot()));
 }
 

@@ -324,7 +324,7 @@ void ContralDataWidget::sendSlot()
     buffer.append(char(this->buf_end));
 //    qDebug()<<buffer;
     //设置Ctral参数
-    ctrldata.setCtrlData(buf_collect_contral,buf_collect_rate,buf_collect_res_low+(buf_collect_point>>8),buf_collect_point);
+    ctrldata.setCtrlData(buf_collect_contral,buf_collect_rate,buf_collect_res_low+(buf_collect_res_high<<8),buf_collect_point);
     this->setSDAmount();
     emit(sendSingal(buffer));
 

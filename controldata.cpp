@@ -133,9 +133,8 @@ void ControlData::saveFP(QString path, QVector<SD_FP> data)
     QString str="";
     for (int i=0;i<data.length();i++) {
         str.append(QString::number(data[i].dbVal));
-        str.append(",");
+        str.append("\n");
     }
-    str[str.length()-1]='\n';
     QFile file(path);
     bool isok=file.open(QIODevice::Append);
     if(isok)
@@ -149,9 +148,8 @@ void ControlData::saveLight(QString path, QVector<SD_LIGTH> data)
     QString str="";
     for (int i=0;i<data.length();i++) {
         str.append(QString::number(data[i].dbVal));
-        str.append(",");
+        str.append("\n");
     }
-    str[data.length()-1]='\n';
     QFile file(path);
     bool isok=file.open(QIODevice::Append);
     if(isok)
@@ -165,9 +163,8 @@ void ControlData::saveAngleAcc(QString path, QVector<double> data)
     QString str="";
     for (int i=0;i<data.length();i++) {
         str.append(QString::number(data[i]));
-        str.append(",");
+        str.append("\n");
     }
-    str[data.length()-1]='\n';
     QFile file(path);
     bool isok=file.open(QIODevice::Append);
     if(isok)
@@ -181,9 +178,8 @@ void ControlData::saveSnore(QString path, QVector<SD_SNORE> data)
     QString str="";
     for (int i=0;i<data.length();i++) {
         str.append(QString::number(data[i].dbVal));
-        str.append(",");
+        str.append("\n");
     }
-    str[data.length()-1]='\n';
     QFile file(path);
     bool isok=file.open(QIODevice::Append);
     if(isok)
@@ -197,9 +193,8 @@ void ControlData::saveGro(QString path, QVector<SD_GRO> data)
     QString str="";
     for (int i=0;i<data.length();i++) {
         str.append(QString::number(data[i].dbVal));
-        str.append(",");
+        str.append("\n");
     }
-    str[data.length()-1]='\n';
     QFile file(path);
     bool isok=file.open(QIODevice::Append);
     if(isok)
@@ -213,9 +208,8 @@ void ControlData::saveACC(QString path, QVector<SD_ACC> data)
     QString str="";
     for (int i=0;i<data.length();i++) {
         str.append(QString::number(data[i].dbVal));
-        str.append(",");
+        str.append("\n");
     }
-    str[data.length()-1]='\n';
     QFile file(path);
     bool isok=file.open(QIODevice::Append);
     if(isok)

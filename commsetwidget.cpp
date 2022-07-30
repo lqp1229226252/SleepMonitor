@@ -99,10 +99,10 @@ void CommSetWidget::messageBox(QString str)
     msgBox.exec();
 }
 
-void CommSetWidget::setCtrlData(int nFP, int nSnore, int nLight, int nGroAcc)
-{
-    this->sensordata.setCtrlData(nFP,nSnore,nLight,nGroAcc);
-}
+//void CommSetWidget::setCtrlData(int nFP, int nSnore, int nLight, int nGroAcc)
+//{
+//    this->sensordata.setCtrlData(nFP,nSnore,nLight,nGroAcc);
+//}
 SensorData *CommSetWidget::getSensorData()
 {
     return &sensordata;
@@ -135,7 +135,15 @@ void CommSetWidget::on_pause_clicked()
 //    write("123456");
     if(serial->isOpen())
     {
-       pause_flag=true;
+       if(pause_flag)
+       {
+           pause_flag=false;
+       }
+       else
+       {
+          pause_flag=true;
+       }
+
     }
     else {
         this->messageBox("串口没有打开");

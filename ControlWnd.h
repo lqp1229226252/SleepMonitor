@@ -27,13 +27,32 @@ class ControlWnd: public QWidget
 public:
     ControlWnd(QWidget *parent = nullptr);
     ~ControlWnd();
+    void  setSaveConnect();
 public slots:
     void get_eegwnd(EEGWnd *,OutPutWnd *);
-    void FPOverFlowSlot();
-    void lightOverFlowSlot();
-    void angleaccOverFlowSlot();
-    void snoreOverFlowSlot();
-    void groaccOverFlowSlot();
+
+    void FP1OverFlowSlot();
+    void FP2OverFlowSlot();
+
+    void redLightOverFlowSlot();
+    void nearRedLightOverFlowSlot();
+    void greenLightOverFlowSlot();
+
+    void seatAngleOverFlowSlot();
+    void rollAngleOverFlowSlot();
+    void AccOverFlowSlot();
+
+    void LSnoreOverFlowSlot();
+    void RSnoreOverFlowSlot();
+
+    void groXOverFlowSlot();
+    void groYOverFlowSlot();
+    void groZOverFlowSlot();
+
+    void accXOverFlowSlot();
+    void accYOverFlowSlot();
+    void accZOverFlowSlot();
+
 
 
 signals:

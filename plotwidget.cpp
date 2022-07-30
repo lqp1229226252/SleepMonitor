@@ -171,6 +171,10 @@ void PlotWidget::SetValues (double val)
 }
 void PlotWidget::AddDatum(double val)
 {
+//    if(this->id==0)
+//    {
+//        qDebug()<<val;
+//    }
     ui->dynamicplot->AddDatum(val);
 }
 //设置曲线名称

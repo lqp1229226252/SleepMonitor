@@ -26,16 +26,33 @@ SensorData::SensorData(QObject *object):QObject(object)
     m_vXacc.resize(MAX_LENGTH);
     m_vYacc.resize(MAX_LENGTH);
     m_vZacc.resize(MAX_LENGTH);
-    this->m_nFPAmount=0;
-    this->m_nSnoreAmount=0;
-    this->m_nLightAmount=0;
-    this->m_nGroAccAmount=0;
-    this->m_nAngleAccAmount=0;
+    this->m_nFP1Amount=0;
+    this->m_nFP2Amount=0;
+
+    this->m_nRedLightAmount=0;
+    this->m_nNearRedLightAmount=0;
+    this->m_nGreenLightAmount=0;
+
+    this->m_nLSnoreAmount=0;
+    this->m_nRSnoreAmount=0;
+
+    this->m_nSeatAngleAmount=0;
+    this->m_nRollAngleAmount=0;
+    this->m_nAccAmount=0;
+
+    this->m_nGroxAmount=0;
+    this->m_nGroyAmount=0;
+    this->m_nGrozAmount=0;
+    this->m_nAccxAmount=0;
+    this->m_nAccyAmount=0;
+    this->m_nAcczAmount=0;
+
 
     this->m_nFP=5;
     this->m_nLight=1;
     this->m_nSnore=10;
     this->m_nGroAcc=1;
+    this->m_source=0x0000;
     m_vSrcData.resize(0);
 }
 void SensorData::appendData(QByteArray pData)
@@ -54,12 +71,13 @@ void SensorData::appendData(QByteArray pData)
     }
 }
 
-void SensorData::setCtrlData(int nFP,int n_Snore,int n_Light,int n_GroAcc)
+void SensorData::setCtrlData(int nFP,int n_Light,int n_Snore,int n_GroAcc,quint16 m_source)
 {
     this->m_nFP=nFP;
     this->m_nSnore=n_Snore;
     this->m_nLight=n_Light;
     this->m_nGroAcc=n_GroAcc;
+    this->m_source=m_source;
 }
 
 int SensorData::getFPNum()
@@ -247,140 +265,307 @@ void SensorData::paraAllData(QByteArray buffer)
     QByteArray data;
     QVector<double> vector(m_nFP*2+m_nLight*3+m_nSnore*2+3+m_nGroAcc*6);
     int data_index=0;
+    //插入FP数据
     for(int i=0;i<m_nFP;i++)
     {
-         //插入FP1数据
-         int FP1_index=index;
-         data=getdata(buffer,FP1_index,index+4);
-         SD_FP fp1=paraFPData(data);
-         vector[data_index]=fp1.dbVal;
-         insertData(this->m_vFP1,fp1);
-
-         //插入FP2
-         int FP2_index=index+m_nFP*4;
-         data=getdata(buffer,FP2_index,FP2_index+4);
-         SD_FP fp2=paraFPData(data);
-         vector[data_index+m_nFP]=fp2.dbVal;
-         insertData(this->m_vFP2,fp2);
-         index+=4;
+        //插入FP1数据
+         if(this->m_source&0x8000)
+         {
+             int FP1_index=index;
+             data=getdata(buffer,FP1_index,index+4);
+             SD_FP fp1=paraFPData(data);
+             vector[data_index]=fp1.dbVal;
+             insertData(this->m_vFP1,fp1,m_nFP1Amount);
+             index+=4;
+             updateFP1Amount();
+         }
+         else
+         {
+             vector[data_index]=0;
+         }
          data_index++;
-         updateFPAmount();
+
     }
-    index+=m_nFP*4;
-    data_index+=m_nFP;
+
+    for(int i=0;i<m_nFP;i++)
+    {
+        //插入FP2
+        if(this->m_source&0x4000)
+        {
+            int FP2_index=index;
+            data=getdata(buffer,FP2_index,FP2_index+4);
+            SD_FP fp2=paraFPData(data);
+            vector[data_index]=fp2.dbVal;
+            insertData(this->m_vFP2,fp2,m_nFP2Amount);
+            index+=4;
+            updateFP2Amount();
+        }
+        else
+        {
+             vector[data_index]=0;
+        }
+
+        data_index++;
+    }
+
+    //插入灯光数据
 
     for(int i=0;i<m_nLight;i++)
     {
         //解析红光数据
-         int red_index=index;
-         data=getdata(buffer,red_index,red_index+3);
-         SD_LIGTH light_red=paraLightData(data);
-         vector[data_index]=light_red.dbVal;
-         insertData(this->m_vRedLight,light_red);
+        if(this->m_source&0x2000)
+        {
+            int red_index=index;
+            data=getdata(buffer,red_index,red_index+3);
+            SD_LIGTH light_red=paraLightData(data);
+            vector[data_index]=light_red.dbVal;
+            insertData(this->m_vRedLight,light_red,m_nRedLightAmount);
+            index+=3;
+            updateRedLightAmount();
+        }
+        else
+        {
+            vector[data_index]=0;
+        }
 
-         //解析近红光数据
-         int near_index=index+m_nLight*3;
-         data=getdata(buffer,near_index,near_index+3);
-         SD_LIGTH light_near_red=paraLightData(data);
-         vector[data_index]=light_near_red.dbVal;
-         insertData(this->m_vNearRedLight,light_near_red);
-
-         //解析绿光数据
-         int green_index=index+m_nLight*3*2;
-         data=getdata(buffer,green_index,green_index+3);
-         SD_LIGTH light_green=paraLightData(data);
-         vector[data_index]=light_green.dbVal;
-         insertData(this->m_vGreenLight,light_green);
-
-         index+=3;
          data_index++;
-         updateLightAmount();
-
     }
-    data_index+=m_nLight*2;
-    index+=m_nLight*3*2;
+
+    for(int i=0;i<m_nLight;i++)
+    {
+         //解析近红光数据
+        if(this->m_source&0x1000)
+        {
+            int near_index=index;
+            data=getdata(buffer,near_index,near_index+3);
+            SD_LIGTH light_near_red=paraLightData(data);
+            vector[data_index]=light_near_red.dbVal;
+            insertData(this->m_vNearRedLight,light_near_red,m_nNearRedLightAmount);
+            index+=3;
+            updateNearRedLightAmount();
+        }
+        else
+        {
+            vector[data_index]=0;
+        }
+
+         data_index++;
+    }
+    for(int i=0;i<m_nLight;i++)
+    {
+        //解析绿光数据
+        if(this->m_source&0x0800)
+        {
+            int green_index=index;
+            data=getdata(buffer,green_index,green_index+3);
+            SD_LIGTH light_green=paraLightData(data);
+            vector[data_index]=light_green.dbVal;
+            insertData(this->m_vGreenLight,light_green,m_nGreenLightAmount);
+            index+=3;
+            updateGreenLightAmount();
+        }
+        else
+        {
+            vector[data_index]=0;
+        }
+
+         data_index++;
+    }
+
+
     //解析坐立角数据
-    data=getdata(buffer,index,index+2);
-    double seat_angle=paraAngleData(data);
-    vector[data_index]=seat_angle;
-    insertData(this->m_vSeatAngle,seat_angle);
-    index+=2;
+    if(this->m_source&0x0400)
+    {
+        data=getdata(buffer,index,index+2);
+        double seat_angle=paraAngleData(data);
+        vector[data_index]=seat_angle;
+        insertData(this->m_vSeatAngle,seat_angle,m_nSeatAngleAmount);
+        index+=2;
+        updateSeatAngelAmount();
+    }
+    else
+    {
+       vector[data_index]=0;
+    }
     data_index++;
     //解析翻滚角数据
-    data=getdata(buffer,index,index+2);
-    double roll_angel=paraAngleData(data);
-    vector[data_index]=roll_angel;
-    insertData(this->m_vRollAngle,roll_angel);
-    index+=2;
+    if(this->m_source&0x0200)
+    {
+        data=getdata(buffer,index,index+2);
+        double roll_angel=paraAngleData(data);
+        vector[data_index]=roll_angel;
+        insertData(this->m_vRollAngle,roll_angel,m_nRollAngleAmount);
+        index+=2;
+        updateRollAngelAmount();
+    }
+    else
+    {
+        vector[data_index]=0;
+    }
     data_index++;
     //解析运动加速度数据
-    data=getdata(buffer,index,index+2);
-    double action_acc=paraActionAccData(data);
-    vector[data_index]=action_acc;
-    insertData(this->m_vAcceleration,action_acc);
-    index+=2;
+    if(this->m_source&0x0100)
+    {
+        data=getdata(buffer,index,index+2);
+        double action_acc=paraActionAccData(data);
+        vector[data_index]=action_acc;
+        insertData(this->m_vAcceleration,action_acc,m_nAccAmount);
+        index+=2;
+        updateAccAmount();
+    }
+    else
+    {
+        vector[data_index]=0;
+    }
     data_index++;
-    updateAngelAccAmount();
+
 
     for(int i=0;i<m_nSnore;i++)
     {
         //解析左鼾声数据
-        data=getdata(buffer,index,index+3);
-        SD_SNORE snore_left=paraSnoreData(data);
-        vector[data_index]=snore_left.dbVal;
-        insertData(this->m_vLSnore,snore_left);
-        //解析右鼾声数据
-        int right_index=index+m_nSnore*3;
-        data=getdata(buffer,right_index,right_index+3);
-        SD_SNORE snore_right=paraSnoreData(data);
-        vector[data_index+m_nSnore]=snore_right.dbVal;
-        insertData(this->m_vRSnore,snore_right);
-
-        index+=3;
+        if(this->m_source&0x0080)
+        {
+            data=getdata(buffer,index,index+3);
+            SD_SNORE snore_left=paraSnoreData(data);
+            vector[data_index]=snore_left.dbVal;
+            insertData(this->m_vLSnore,snore_left,m_nLSnoreAmount);
+            index+=3;
+            updateLSnoreAmount();
+        }
+        else
+        {
+             vector[data_index]=0;
+        }
         data_index++;
-        updateSnoreAmount();
     }
-    data_index+=m_nSnore;
-    index+=m_nSnore;
+    for(int i=0;i<m_nSnore;i++)
+    {
+         //解析右鼾声数据
+        if(this->m_source&0x0040)
+        {
+            int right_index=index;
+            data=getdata(buffer,right_index,right_index+3);
+            SD_SNORE snore_right=paraSnoreData(data);
+            vector[data_index]=snore_right.dbVal;
+            insertData(this->m_vRSnore,snore_right,m_nRSnoreAmount);
+            index+=3;
+            updateRSnoreAmount();
+        }
+        else
+        {
+             vector[data_index]=0;
+        }
+        data_index++;
+
+    }
+
     for(int i=0;i<m_nGroAcc;i++)
     {
         //解析x-gro数据
-        data=getdata(buffer,index,index+3);
-        SD_GRO gro_x=paraGroData(data);
-        insertData(this->m_vXgro,gro_x);
-        vector[data_index]=gro_x.dbVal;
-         //解析y-gro数据
-        int temp_index=index+m_nGroAcc*3;
-        data=getdata(buffer,temp_index,temp_index+3);
-        SD_GRO gro_y=paraGroData(data);
-        insertData(m_vYgro,gro_y);
-        vector[data_index+m_nGroAcc]=gro_y.dbVal;
-         //解析z-gro数据
-        temp_index=index+m_nGroAcc*3*2;
-        data=getdata(buffer,temp_index,temp_index+3);
-        SD_GRO gro_z=paraGroData(data);
-        insertData(m_vZgro,gro_z);
-        vector[data_index+m_nGroAcc*2]=gro_z.dbVal;
-        //解析x-acc数据
-         temp_index=index+m_nGroAcc*3*3;
-         data=getdata(buffer,temp_index,temp_index+3);
-        SD_ACC acc_x=paraAccData(data);
-        insertData(m_vXacc,acc_x);
-         vector[data_index+m_nGroAcc*3]=acc_x.dbVal;
-         //解析y-acc数据
-        temp_index=index+m_nGroAcc*3*4;
-        data=getdata(buffer,temp_index,temp_index+3);
-        SD_ACC acc_y=paraAccData(data);
-        insertData(m_vYacc,acc_y);
-        vector[data_index+m_nGroAcc*4]=acc_y.dbVal;
-         //解析z-acc数据
-        temp_index=index+m_nGroAcc*3*5;
-        data=getdata(buffer,temp_index,temp_index+3);
-        SD_ACC acc_z=paraAccData(data);
-        insertData(m_vZacc,acc_z);
-        vector[data_index+m_nGroAcc*5]=acc_z.dbVal;
+        if(this->m_source&0x0020)
+        {
+            data=getdata(buffer,index,index+3);
+            SD_GRO gro_x=paraGroData(data);
+            insertData(this->m_vXgro,gro_x,m_nGroxAmount);
+            vector[data_index]=gro_x.dbVal;
+            index+=3;
+            updateGROXAmount();
+        }
+        else
+        {
+            vector[data_index]=0;
+        }
         data_index++;
-        updateGROACCAmount();
+    }
+    for(int i=0;i<m_nGroAcc;i++)
+    {
+        //解析y-gro数据
+        if(this->m_source&0x0010)
+        {
+            data=getdata(buffer,index,index+3);
+            SD_GRO gro_y=paraGroData(data);
+            insertData(m_vYgro,gro_y,m_nGroyAmount);
+            vector[data_index]=gro_y.dbVal;
+            index+=3;
+            updateGROYAmount();
+        }
+        else
+        {
+            vector[data_index]=0;
+        }
+        data_index++;
+    }
+    for(int i=0;i<m_nGroAcc;i++)
+    {
+        //解析z-gro数据
+        if(this->m_source&0x0008)
+        {
+            data=getdata(buffer,index,index+3);
+            SD_GRO gro_z=paraGroData(data);
+            insertData(m_vZgro,gro_z,m_nGrozAmount);
+            vector[data_index]=gro_z.dbVal;
+            index+=3;
+            updateGROZAmount();
+        }
+        else
+        {
+            vector[data_index]=0;
+        }
+        data_index++;
+    }
+    for(int i=0;i<m_nGroAcc;i++)
+    {
+       //解析x-acc数据
+        if(this->m_source&0x0004)
+        {
+            data=getdata(buffer,index,index+3);
+            SD_ACC acc_x=paraAccData(data);
+            insertData(m_vXacc,acc_x,m_nAccxAmount);
+            vector[data_index]=acc_x.dbVal;
+            index+=3;
+            updateACCXAmount();
+        }
+        else
+        {
+            vector[data_index]=0;
+        }
+        data_index++;
+    }
+    for(int i=0;i<m_nGroAcc;i++)
+    {
+       //解析y-acc数据
+        if(this->m_source&0x0002)
+        {
+            data=getdata(buffer,index,index+3);
+            SD_ACC acc_y=paraAccData(data);
+            insertData(m_vYacc,acc_y,m_nAccyAmount);
+            vector[data_index]=acc_y.dbVal;
+            index+=3;
+            updateACCYAmount();
+        }
+        else
+        {
+            vector[data_index]=0;
+        }
+        data_index++;
+    }
+    for(int i=0;i<m_nGroAcc;i++)
+    {
+       //解析y-acc数据
+        if(this->m_source&0x0001)
+        {
+            data=getdata(buffer,index,index+3);
+            SD_ACC acc_z=paraAccData(data);
+            insertData(m_vZacc,acc_z,m_nAcczAmount);
+            vector[data_index]=acc_z.dbVal;
+            index+=3;
+            updateACCZAmount();
+        }
+        else
+        {
+            vector[data_index]=0;
+        }
+        data_index++;
     }
     emit(dataSignal(vector));
 
@@ -475,34 +660,34 @@ STATE_DATA SensorData::paraStateData(QByteArray buffer)
     return state;
 }
 
-void SensorData::insertData(QVector<SD_FP> &list, SD_FP data)
+void SensorData::insertData(QVector<SD_FP> &list, SD_FP data,int index)
 {
-    list[m_nFPAmount]=data;
+    list[index]=data;
 }
 
-void SensorData::insertData(QVector<SD_LIGTH> &list, SD_LIGTH data)
+void SensorData::insertData(QVector<SD_LIGTH> &list, SD_LIGTH data,int index)
 {
-    list[m_nLightAmount]=data;
+    list[index]=data;
 }
 
-void SensorData::insertData(QVector<double> &list, double data)
+void SensorData::insertData(QVector<double> &list, double data,int index)
 {
-    list[m_nAngleAccAmount]=data;
+    list[index]=data;
 }
 
-void SensorData::insertData(QVector<SD_SNORE> &list, SD_SNORE data)
+void SensorData::insertData(QVector<SD_SNORE> &list, SD_SNORE data,int index)
 {
-    list[m_nSnoreAmount]=data;
+    list[index]=data;
 }
 
-void SensorData::insertData(QVector<SD_GRO> &list, SD_GRO data)
+void SensorData::insertData(QVector<SD_GRO> &list, SD_GRO data,int index)
 {
-    list[m_nGroAccAmount]=data;
+    list[index]=data;
 }
 
-void SensorData::insertData(QVector<SD_ACC> &list, SD_ACC data)
+void SensorData::insertData(QVector<SD_ACC> &list, SD_ACC data,int index)
 {
-    list[m_nGroAccAmount]=data;
+    list[index]=data;
 
 }
 
@@ -511,55 +696,164 @@ void SensorData::insertData(QVector<STATE_DATA> &list, STATE_DATA data)
     list.append(data);
 }
 
-void SensorData::updateFPAmount()
+void SensorData::updateFP1Amount()
 {
-    m_nFPAmount++;
-    if(m_nFPAmount==MAX_LENGTH)
+    m_nFP1Amount++;
+    if(m_nFP1Amount==MAX_LENGTH)
     {
-        m_nFPAmount=0;
-        emit(FPOverFlow());
+        m_nFP1Amount=0;
+        emit(FP1OverFlow());
     }
 }
 
-void SensorData::updateLightAmount()
+void SensorData::updateFP2Amount()
 {
-    m_nLightAmount++;
-    if(m_nLightAmount==MAX_LENGTH)
+    m_nFP2Amount++;
+    if(m_nFP2Amount==MAX_LENGTH)
     {
-        m_nLightAmount=0;
-        emit(lightOverFlow());
+        m_nFP2Amount=0;
+        emit(FP2OverFlow());
     }
 }
 
-void SensorData::updateSnoreAmount()
+void SensorData::updateRedLightAmount()
 {
-    m_nSnoreAmount++;
-    if(m_nSnoreAmount==MAX_LENGTH)
+    m_nRedLightAmount++;
+    if(m_nRedLightAmount==MAX_LENGTH)
     {
-        m_nSnoreAmount=0;
-        emit(snoreOverFlow());
+        m_nRedLightAmount=0;
+        emit(redLightOverFlow());
+    }
+}
+
+void SensorData::updateNearRedLightAmount()
+{
+    m_nNearRedLightAmount++;
+    if(m_nNearRedLightAmount==MAX_LENGTH)
+    {
+        m_nNearRedLightAmount=0;
+        emit(nearRedLightOverFlow());
+    }
+}
+
+void SensorData::updateGreenLightAmount()
+{
+    m_nGreenLightAmount++;
+    if(m_nGreenLightAmount==MAX_LENGTH)
+    {
+        m_nGreenLightAmount=0;
+        emit(greenLightOverFlow());
+    }
+}
+
+void SensorData::updateSeatAngelAmount()
+{
+    m_nSeatAngleAmount++;
+    if(m_nSeatAngleAmount==MAX_LENGTH)
+    {
+        m_nSeatAngleAmount=0;
+        emit(seatAngleOverFlow());
+    }
+}
+
+void SensorData::updateRollAngelAmount()
+{
+    m_nRollAngleAmount++;
+    if(m_nRollAngleAmount==MAX_LENGTH)
+    {
+        m_nRollAngleAmount=0;
+        emit(rollAngleOverFlow());
+    }
+}
+
+void SensorData::updateAccAmount()
+{
+    m_nAccAmount++;
+    if(m_nAccAmount==MAX_LENGTH)
+    {
+        m_nAccAmount=0;
+        emit(accOverFlow());
+    }
+}
+
+void SensorData::updateLSnoreAmount()
+{
+    m_nLSnoreAmount++;
+    if(m_nLSnoreAmount==MAX_LENGTH)
+    {
+        m_nLSnoreAmount=0;
+        emit(lSnoreOverFlow());
     }
 
 }
 
-void SensorData::updateGROACCAmount()
+void SensorData::updateRSnoreAmount()
 {
-    m_nGroAccAmount++;
-    if(m_nGroAccAmount==MAX_LENGTH)
+    m_nRSnoreAmount++;
+    if(m_nRSnoreAmount==MAX_LENGTH)
     {
-        m_nGroAccAmount=0;
-        emit(GroACCOverFlow());
+        m_nRSnoreAmount=0;
+        emit(rSnoreOverFlow());
     }
-
 }
 
-void SensorData::updateAngelAccAmount()
+void SensorData::updateGROXAmount()
 {
-    m_nAngleAccAmount++;
-    if(m_nAngleAccAmount==MAX_LENGTH)
+    m_nGroxAmount++;
+    if(m_nGroxAmount==MAX_LENGTH)
     {
-        m_nAngleAccAmount=0;
-        emit(AngleAccOverFlow());
+        m_nGroxAmount=0;
+        emit(GroXOverFlow());
+    }
+}
+
+void SensorData::updateGROYAmount()
+{
+    m_nGroyAmount++;
+    if(m_nGroyAmount==MAX_LENGTH)
+    {
+        m_nGroyAmount=0;
+        emit(GroYOverFlow());
+    }
+}
+
+void SensorData::updateGROZAmount()
+{
+    m_nGrozAmount++;
+    if(m_nGrozAmount==MAX_LENGTH)
+    {
+        m_nGrozAmount=0;
+        emit(GroZOverFlow());
+    }
+}
+
+void SensorData::updateACCXAmount()
+{
+    m_nAccxAmount++;
+    if(m_nAccxAmount==MAX_LENGTH)
+    {
+        m_nAccxAmount=0;
+        emit(ACCXOverFlow());
+    }
+}
+
+void SensorData::updateACCYAmount()
+{
+    m_nAccyAmount++;
+    if(m_nAccyAmount==MAX_LENGTH)
+    {
+        m_nAccyAmount=0;
+        emit(ACCYOverFlow());
+    }
+}
+
+void SensorData::updateACCZAmount()
+{
+    m_nAcczAmount++;
+    if(m_nAcczAmount==MAX_LENGTH)
+    {
+        m_nAcczAmount=0;
+        emit(ACCZOverFlow());
     }
 }
 
