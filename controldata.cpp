@@ -11,6 +11,11 @@ ControlData::ControlData(QObject *object):QObject (object)
     this->m_SensorDataAmount.nSnore=10;
     this->m_SensorDataAmount.nLight=1;
     this->m_SensorDataAmount.nGroAcc=1;
+    this->stride.fp=2;
+    this->stride.light=10;
+    this->stride.snore=1;
+    this->stride.groacc=10;
+    this->data_Maxnum=10;
     storage_falg=false;
 }
 
@@ -31,6 +36,24 @@ void ControlData::setSensorDataAmount(int FP,int Snore,int Light,int GroAcc,qint
     this->m_SensorDataAmount.nLight=Light;
     this->m_SensorDataAmount.nGroAcc=GroAcc;
     this->m_SensorDataAmount.nFrameLen=FrameLen;
+    setStride();
+
+}
+
+void ControlData::setStride()
+{
+    QList<int> list;
+    list.append(m_SensorDataAmount.nFP);
+    list.append(m_SensorDataAmount.nSnore);
+    list.append(m_SensorDataAmount.nGroAcc);
+    list.append(m_SensorDataAmount.nLight);
+    qSort(list.begin(),list.end());
+    int max_num=list.last();
+    data_Maxnum=max_num;
+    stride.fp=max_num/m_SensorDataAmount.nFP;
+    stride.light=max_num/m_SensorDataAmount.nLight;
+    stride.snore=max_num/m_SensorDataAmount.nSnore;
+    stride.groacc=max_num/m_SensorDataAmount.nGroAcc;
 }
 CTRL_DATA ControlData::getCtrlData()
 {
@@ -44,6 +67,16 @@ CTRL_DATA* ControlData::getCtrlDate()
 SD_AMOUNT ControlData::getSensorDataAmount()
 {
     return this->m_SensorDataAmount;
+}
+
+Stride ControlData::getStride()
+{
+    return this->stride;
+}
+
+int ControlData::getMaxNum()
+{
+    return this->data_Maxnum;
 }
 
 int ControlData::getFPAmount()

@@ -4,6 +4,13 @@
 #include "struct_data.h"
 #include "QVector"
 #include "QObject"
+typedef struct stride
+{
+    int fp;
+    int light;
+    int snore;
+    int groacc;
+}Stride;
 class ControlData:public QObject
 {
     Q_OBJECT
@@ -35,19 +42,25 @@ private:
     QString m_strPathAccZ;
 
     bool storage_falg;
+    Stride stride;
+    int data_Maxnum;//数据最大数目
 public:
     explicit ControlData(QObject *parent=nullptr);
 //    ~ControlData();
     void setCtrlData(quint8,quint8,quint16,quint16);
     void setSensorDataAmount(int,int,int,int,qint16);
+    void setStride();
     CTRL_DATA getCtrlData();
     CTRL_DATA* getCtrlDate();
     SD_AMOUNT getSensorDataAmount();
+    Stride getStride();
+    int getMaxNum();
     int getFPAmount();
     int getSnoreAmount();
     int getLightAmount();
     int getGroAccAmount();
     qint16 getFrameLen();
+
 
 
     bool getSaveFlag();

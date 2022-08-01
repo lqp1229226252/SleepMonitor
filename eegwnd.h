@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QVector>
-#include <Qstring>
+#include <QString>
 #include "plotwidget.h"
 
 namespace Ui {
@@ -30,7 +30,6 @@ public:
     void send_16PlotWidget_position(void);
     //获取布局中窗口的大小，布局中的窗口如果直接获取的话不管在哪都是(0,0)
     void get_plotwidget_position(void);
-    bool event(QEvent *e);
 
 
 private:

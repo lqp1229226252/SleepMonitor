@@ -21,6 +21,9 @@ EEGWnd::EEGWnd(QWidget *parent) :
     //qDebug()<<names.size();
 
 //    startTimer(50);
+//    get_plotwidget_position();
+
+//    send_16PlotWidget_position();
 
 }
 
@@ -93,18 +96,6 @@ void EEGWnd::get_plotwidget_position(void)
         plotwidget_position.append( plotwidget->geometry());
     }
 }
-bool EEGWnd::event(QEvent *e)
-{
-    if (QEvent::WindowActivate == e->type())
-        {
-            //只要窗口一变就获取到最新的相对位置
-            get_plotwidget_position();
-            //发送给每一个widget最新的相对位置，
-            send_16PlotWidget_position();
-        }
-         return QWidget::event(e);
-}
-
 //调用内部各个PlotWidget实例的SetValues
 void EEGWnd::SetPlotAmount(int num)
 {
