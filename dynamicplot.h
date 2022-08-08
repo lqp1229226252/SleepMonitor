@@ -266,7 +266,6 @@ private:
     QString line_name;
 
 
-
 };
 
 #endif // LINEARPLOT_H

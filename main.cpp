@@ -8,8 +8,8 @@ int main(int argc, char *argv[])
     SleepMonitor w;
 //    w.setWindowFlag(Qt::Window);
 //    w.showFullScreen();
-//    w.setWindowState(Qt::WindowMaximized);
-    w.setWindowIcon(QIcon(":/icon/icon.jpg"));
+    w.setWindowState(Qt::WindowMaximized);
+    w.setWindowIcon(QIcon(":/icon/sleepmonitor.ico"));
     w.show();
 
     return a.exec();

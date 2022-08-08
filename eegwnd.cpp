@@ -39,17 +39,25 @@ EEGWnd::~EEGWnd()
 
     delete ui;
 }
+
 //接口
 //依次调用内部PlotWidget实例的AddDatum，将data中的值传给各个PlotWidget实例
 void EEGWnd::AddData(QVector<double> data)
 {
 //    qDebug()<<"insertData:"<<data;
+
+    //开线程，在16个线程中调用AddDatum
     int i=0;
     for(auto PlotWidgetPtr : m_PlotWidgetPtrs)
     {
         PlotWidgetPtr->AddDatum(data[i++]);
     }
+
+
+
 }
+
+
 
 //调用内部各个PlotWidget实例的Initialize
 void EEGWnd::Initialize(void)

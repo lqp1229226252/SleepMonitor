@@ -16,7 +16,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
+ICON
 SOURCES += \
     ContralDataWidget.cpp \
     ControlWnd.cpp \
@@ -79,3 +79,4 @@ include($$[QT_INSTALL_PREFIX]/../Src/qttools/src/shared/qtpropertybrowser/qtprop
 RESOURCES += \
     res.qrc \
     resources.qrc
+RC_ICONS=icon/sleepmonitor.ico

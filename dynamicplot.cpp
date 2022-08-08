@@ -93,11 +93,11 @@ DynamicPlot::DynamicPlot(QWidget *parent, const QString fileName) :
     //开始的时候右侧属性表不可见
     ui->tableWidget->setVisible(false);
     connect(plotAnimation, &QPropertyAnimation::finished, this, &DynamicPlot::animationFinished);
+    qsrand(QTime::currentTime().msec() + QTime::currentTime().second() * 10000);
 
 
 
-
-//    startTimer(1);
+    startTimer(30);
 
 
 }
@@ -165,18 +165,20 @@ void DynamicPlot::setTableVisible()
 
 }
 
+
+//注意：如果我们接收到的数据点过于频繁，我们不应该每收到一个点都要刷新图像，那样程序效率太低，也没必要。一般设置每30ms刷新一次就足够流畅了，毕竟我们下载的普通电影也就30帧每秒。
+//因此，我们在一个30ms定时器的槽函数中来做：修改X轴的显示范围+刷新图像。
 void DynamicPlot::timerEvent(QTimerEvent *event)
 {
 
 
-    //   qsrand(QTime::currentTime().msec() + QTime::currentTime().second() * 10000);
-
-    //    double value = qrand() % 100;
-
-    //定时器只生成一个x坐标，y坐标通过上级的类通过addDatum来传递
-    sampleNumber+=1;
-
-    //AddDatum(value);
+    //设置x轴不断更新函数原型
+    //void QCPAxis::setRange(double position,doublesize,Qt::AlignmentFlag alignment)
+    //参数含义：position定位的点 doublesize轴的范围大小 alignment对齐方式
+    //例如下面这个setRange(sampleNumber, 50, Qt::AlignRight);
+    //就解释为：新生成的x这个点一直在右边框，这样就可以一直刷新x轴了
+    ui->plotWidget->xAxis->setRange(sampleNumber, this->xAxisUpper, Qt::AlignRight);
+    ui->plotWidget->replot();
 
 
 }
@@ -203,18 +205,22 @@ void DynamicPlot::SetValues(double val)
 void DynamicPlot::AddDatum(double val)
 {
 
-    //
+
     sampleNumber+=1;
     ui->plotWidget->graph(0)->addData(sampleNumber,val);
 
-    //设置x轴不断更新函数原型
-    //void QCPAxis::setRange(double position,doublesize,Qt::AlignmentFlag alignment)
-    //参数含义：position定位的点 doublesize轴的范围大小 alignment对齐方式
-    //例如下面这个setRange(sampleNumber, 50, Qt::AlignRight);
-    //就解释为：新生成的x这个点一直在右边框，这样就可以一直刷新x轴了
-    ui->plotWidget->xAxis->setRange(sampleNumber, this->xAxisUpper, Qt::AlignRight);
+    //注意：如果我们接收到的数据点过于频繁，我们不应该每收到一个点都要刷新图像，那样程序效率太低，也没必要。一般设置每30ms刷新一次就足够流畅了，毕竟我们下载的普通电影也就30帧每秒。
+    //因此，我们在一个30ms定时器的槽函数中来做：修改X轴的显示范围+刷新图像。
 
-    ui->plotWidget->replot();
+    //    //设置x轴不断更新函数原型
+    //    //void QCPAxis::setRange(double position,doublesize,Qt::AlignmentFlag alignment)
+    //    //参数含义：position定位的点 doublesize轴的范围大小 alignment对齐方式
+    //    //例如下面这个setRange(sampleNumber, 50, Qt::AlignRight);
+    //    //就解释为：新生成的x这个点一直在右边框，这样就可以一直刷新x轴了
+//        ui->plotWidget->xAxis->setRange(sampleNumber, this->xAxisUpper, Qt::AlignCenter);
+//        ui->plotWidget->replot();
+
+
 }
 //添加曲线名称接口
 void DynamicPlot::setLineName(QString name)
@@ -371,7 +377,7 @@ void DynamicPlot::setXYvisbile(bool f)
 DynamicPlot::~DynamicPlot()
 {
     delete ui;
-
+    qDebug()<<this->sampleNumber;
     if (myCustomPlot != nullptr)
     {
         delete myCustomPlot;
