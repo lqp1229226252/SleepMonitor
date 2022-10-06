@@ -20,7 +20,7 @@ EEGWnd::EEGWnd(QWidget *parent) :
     setLineName(names);
     //qDebug()<<names.size();
 
-//    startTimer(50);
+   // startTimer(50);
 //    get_plotwidget_position();
 
 //    send_16PlotWidget_position();

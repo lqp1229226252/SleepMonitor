@@ -16,7 +16,7 @@ DynamicPlot::DynamicPlot(QWidget *parent, const QString fileName) :
     xAxisUpper(50),//INT_MIN
     xAxisLower(0),//INT_MAX
     yAxisUpper(10),
-    yAxisLower(0),
+    yAxisLower(-5),
     //设置画布背景颜色
     background0(QColor(240, 240, 240)),
     background1(QColor(240, 240, 240)),
@@ -71,6 +71,8 @@ DynamicPlot::DynamicPlot(QWidget *parent, const QString fileName) :
 
     myCustomPlot = ui->plotWidget;
 
+    connect(myCustomPlot,&QCustomPlot::mouseWheel,this,&DynamicPlot::deal_mouseWheel);
+
     //初始化曲线
 
     Initialize();
@@ -100,8 +102,35 @@ DynamicPlot::DynamicPlot(QWidget *parent, const QString fileName) :
     startTimer(30);
 
 
+
+
 }
-//更新plotwidget中的结构体
+
+//处理qcustomplot窗口的滚轮事件，实现放大和缩小纵坐标的功能
+void DynamicPlot::deal_mouseWheel(QWheelEvent *event)
+{
+
+    if(event->delta()>0) //滚轮向我们走远放大
+    {
+        yAxisUpper *= 0.5;
+        yAxisLower *= 0.5;
+     }
+    else//滚轮向我们靠近缩小
+    {
+        yAxisUpper *= 2;
+        yAxisLower *= 2;
+     }
+
+    //更新结构体里面的值,不写好像也没问题
+    this->my_plot_property->yAxisUpper = yAxisUpper;
+    this->my_plot_property->yAxisLower = yAxisLower;
+
+    this->yupper_item->setValue(yAxisUpper);
+    this->ylower_item->setValue(yAxisLower);
+
+}
+
+//更新plotwidget中的结构体 ————————————————
 void DynamicPlot::update_property_struct(PLOT_PROPERTY *p)
 {
     p->background0 = this->background0;
@@ -166,6 +195,7 @@ void DynamicPlot::setTableVisible()
 }
 
 
+
 //注意：如果我们接收到的数据点过于频繁，我们不应该每收到一个点都要刷新图像，那样程序效率太低，也没必要。一般设置每30ms刷新一次就足够流畅了，毕竟我们下载的普通电影也就30帧每秒。
 //因此，我们在一个30ms定时器的槽函数中来做：修改X轴的显示范围+刷新图像。
 void DynamicPlot::timerEvent(QTimerEvent *event)
@@ -182,6 +212,7 @@ void DynamicPlot::timerEvent(QTimerEvent *event)
 
 
 }
+
 
 //接口-------------------------------------------------------
 
@@ -340,7 +371,9 @@ void DynamicPlot::drawing_Initialize(QCustomPlot* customPlot)
     customPlot->setInteractions(QCP::iSelectPlottables| QCP::iMultiSelect);
 
     connect(myCustomPlot, &QCustomPlot::sendRectCustom, this, &DynamicPlot::magnify);
-    connect(myCustomPlot, &QCustomPlot::mousePress, this, &DynamicPlot::showTracer);
+
+    //鼠标点击显示跟踪的y坐标数据，要用放大功能最好屏蔽了
+    //connect(myCustomPlot, &QCustomPlot::mousePress, this, &DynamicPlot::showTracer);
     //刷新
 
     //x坐标轴可见加上的话曲线显示区域太小
@@ -1152,6 +1185,8 @@ void DynamicPlot::setAxisProperties()
     propertyBar00->addSubProperty(item00);
 
     item00 = pVarManager->addProperty(QVariant::Double, QStringLiteral("y轴上限"));
+    this->yupper_item = item00;
+
     item00->setValue(yAxisUpper);
     axisProIndex.first = AXIS_EPROPERTIES_NAME::Y_AXIS_UPPER;
     axisProIndex.variableName = item00->propertyName();
@@ -1160,6 +1195,7 @@ void DynamicPlot::setAxisProperties()
     propertyBar00->addSubProperty(item00);
 
     item00 = pVarManager->addProperty(QVariant::Double, QStringLiteral("y轴下限"));
+    this->ylower_item = item00;
     item00->setValue(yAxisLower);
     axisProIndex.first = AXIS_EPROPERTIES_NAME::Y_AXIS_LOWER;
     axisProIndex.variableName = item00->propertyName();
@@ -1543,6 +1579,7 @@ void DynamicPlot::setBackgrand()
 //通过结构体更新属性
 void DynamicPlot::update_Axis_line_enum_properties(PLOT_PROPERTY *plot_property)
 {
+
     //updateAxisProperties
 
     QLinearGradient plotGradient;
@@ -1637,6 +1674,7 @@ void DynamicPlot::update_Axis_line_enum_properties(PLOT_PROPERTY *plot_property)
     linePenStyle[0]=plot_property->linePenStyle;
     lineStyle[0] =plot_property->lineStyle;
     lineScatterStyle[0]= plot_property->lineScatterStyle;
+
     //让config文件中的属性同步到头文件代码中再调用更新属性让右侧属性更新成文件中的属性值
     this->setAxisProperties();
     this->setLineProperties(0);
@@ -1644,9 +1682,22 @@ void DynamicPlot::update_Axis_line_enum_properties(PLOT_PROPERTY *plot_property)
 
 
 
+}
 
+void DynamicPlot::updateYRange(PLOT_PROPERTY *plot_property)
+{
+
+    myCustomPlot->yAxis->setRange(plot_property->yAxisLower, plot_property->yAxisUpper);
+    yAxisUpper =plot_property->yAxisUpper;
+    yAxisLower =plot_property->yAxisLower;
+
+    this->yupper_item->setValue(plot_property->yAxisUpper);
+    this->ylower_item->setValue(plot_property->yAxisLower);
 
 }
+
+
+
 void DynamicPlot::updateAxisProperties(const AXIS_EPROPERTIES_NAME propertyName)
 {
     switch (propertyName) {

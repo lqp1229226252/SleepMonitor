@@ -35,7 +35,8 @@ SOURCES += \
     qcustomplot.cpp \
     sensordata.cpp \
     sleepinterventionwidget.cpp \
-    sleepmonitor.cpp
+    sleepmonitor.cpp \
+    test.cpp
 
 HEADERS += \
     ContralDataWidget.h \
@@ -55,7 +56,8 @@ HEADERS += \
     sensordata.h \
     sleepinterventionwidget.h \
     sleepmonitor.h \
-    struct_data.h
+    struct_data.h \
+    test.h
 
 FORMS += \
     ControlWnd.ui \
@@ -67,7 +69,8 @@ FORMS += \
     outputwnd.ui \
     plotwidget.ui \
     sleepinterventionwidget.ui \
-    sleepmonitor.ui
+    sleepmonitor.ui \
+    test.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -26,8 +26,28 @@ PlotWidget::PlotWidget(QWidget *parent) :
     ui->maxmum->setIconSize(QSize(35,35));
 
     ui->maxmum->setFlat(true);
+
+    //通过按钮缩放纵坐标
+    connect(ui->max_button,&QPushButton::clicked,this,&PlotWidget::maxmum_y);
+    connect(ui->min_button,&QPushButton::clicked,this,&PlotWidget::minmum_y);
 }
 
+//放大按钮放大纵坐标上下限 x 0.5
+void PlotWidget::maxmum_y(void)
+{
+    m_Property.yAxisUpper *= 0.5;
+    m_Property.yAxisLower *= 0.5;
+    ui->dynamicplot->updateYRange(&m_Property);
+
+
+}
+//放大按钮放大纵坐标上下限 / 2
+void PlotWidget::minmum_y(void)
+{
+    m_Property.yAxisUpper *= 2;
+    m_Property.yAxisLower *= 2;
+    ui->dynamicplot->updateYRange(&m_Property);
+}
 //从配置文件中读内容到property结构体中
 void PlotWidget::ReadConfig(void)
 {

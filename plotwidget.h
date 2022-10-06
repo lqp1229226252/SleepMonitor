@@ -59,9 +59,14 @@ public:
     QString colorToString(const QColor color);
     QColor stringToColor(const QString str);
 
+
+
 private slots:
     void clicked_maxmum(void);
     void clicked_attribute(void);
+    //放大缩小纵坐标
+    void maxmum_y(void);
+    void minmum_y(void);
 private:
     Ui::PlotWidget *ui;
     //是否最大化标志

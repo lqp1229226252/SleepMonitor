@@ -2,7 +2,6 @@
 #define DYNAMICPLOT_H
 
 #include <QWidget>
-#include <QMouseEvent>
 #include "qcustomplot.h"
 #include <QMetaType>
 #include <qttreepropertybrowser.h>
@@ -16,6 +15,8 @@
 #include "mytracer.h"
 #include "qpropertyanimation.h"
 
+#include <QMouseEvent>
+#include <QWheelEvent>
 
 namespace Ui {
 class DynamicPlot;
@@ -96,6 +97,8 @@ public:
     //通过结构体更新属性
     void update_Axis_line_enum_properties(PLOT_PROPERTY *plot_property);
     void my_updateAxisProperties(void);
+    //更新Y坐标范围，在plotwidget中通过放大缩小按钮控制大小
+    void updateYRange(PLOT_PROPERTY *plot_property);
 
     void updateAxisProperties(const AXIS_EPROPERTIES_NAME propertyName);
     void updateLineProperties(const LINE_EPROPERTIES_NAME propertyName);
@@ -129,6 +132,9 @@ signals:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
+
+
+
 
 public:
     QPointer<QCustomPlot> myCustomPlot;	    //传入实例化的QcustomPlot
@@ -184,6 +190,9 @@ private slots:
     void on_action_new_win_magnify_triggered();
 
     void on_action_recover_triggered();
+
+    //处理qcustomplot窗口的滚轮事件
+    void deal_mouseWheel(QWheelEvent *event);
 
 
 
@@ -264,6 +273,11 @@ private:
 
     //曲线名称
     QString line_name;
+
+    //test
+    QtVariantProperty* ylower_item;
+    QtVariantProperty* yupper_item;
+
 
 
 };
